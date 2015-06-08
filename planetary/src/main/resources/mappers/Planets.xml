@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="Planets">
+
+    <resultMap id="PlanetDomainResult" type="Planet">
+        <result property="id" column="planetId"/>
+        <collection property="resourceIDs" ofType="integer">
+        	<result column="resourceId"/>
+        </collection>
+    </resultMap>
+    
+    <resultMap id="ResourceDomainResult" type="Resource">
+    	<result property="id" column="resourceId"/>
+    	<collection property="planetIDs" ofType="integer">
+    		<result column="planetId"/>
+    	</collection>
+    </resultMap>
+    
+    <select id="getPlanets" resultMap="PlanetDomainResult">
+        SELECT
+			planetId,
+			resourceId			
+		FROM planetaryResourceTypeMap
+    </select>
+    
+    <select id="getResources" resultMap="ResourceDomainResult">
+    	SELECT
+    		resourceId,
+    		planetId
+    	FROM planetaryResourceTypeMap
+    </select>
+</mapper>

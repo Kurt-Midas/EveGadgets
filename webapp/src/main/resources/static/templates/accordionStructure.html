@@ -1,0 +1,8 @@
+<div>
+	<a class = "btn btn-lg btn-link" ng-click="toggle()">
+		<div class="titleLine">{{title}}</div>
+	</a>
+	<div class="childLine" ng-show="showChild">
+		<span ng-transclude></span>
+	</div>
+</div>
