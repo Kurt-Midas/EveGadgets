@@ -1,0 +1,43 @@
+
+<div class="navbar planetTabs barColors borderColors" id="planetNavTabs">
+	
+	<button ng-click="addPlanet()" class="btn btn-primary addPlanetButton planetTabButtonPadding borderColors">
+		Add Planet
+	</button>
+	
+	<button class="btn planetButton planetTabButton planetTabButtonPadding barColor borderColors" 
+    	ng-click="changeActivePlanet(-1); populatePriceMap()" style="color: green">
+    	Information Panel
+    </button>
+	
+    <button class="btn planetButton planetTabButton planetTabButtonPadding" 
+    	ng-repeat="p in planets" ng-click="changeActivePlanet(p.planetID)">
+    	{{p.text}}
+    </button>
+	
+	<button ng-click="ResetPlanets()" class="btn btn-danger addPlanetButton planetTabButtonPadding borderColors"
+		style="float:right">
+		Reset Everything
+	</button>
+</div>
+
+<!-- Infopanel. Turn into switch? Also probably directive -->
+<div class="container-fluid" ng-show="-1 == activePlanet">
+	<div id="infoContent">
+		<eg-planet-infopanel></eg-planet-infopanel>
+		<!-- <div ng-include="'/PIGadget/templates/infopanelTemplate.html'"></div> -->
+	</div>
+</div>
+
+<!-- Planet Managers -->
+<div class="container-fluid" style="padding:0" ng-hide="-1 == activePlanet">
+	<!--Planets -->
+	<div id="planetContent">
+		<eg-planet-creator
+			ng-repeat="p in planets" 
+			ng-show="p.planetID == activePlanet" id="{{p.planetID}}" style="margin:0">
+		</eg-planet-creator>
+	</div>
+</div> <!-- Container -->
+
+<!-- </div> -->

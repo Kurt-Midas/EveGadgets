@@ -1,0 +1,416 @@
+<div class="row">
+	<div class="col-xs-4 infoPanel infoPanelLeft">
+	<h3 class="headerTextColor">Pricing and Profit</h3>
+	<!-- <h3>Test new MarketAPI
+		<button type="btn btn-warning" ng-click="populatePriceMap_true()">Use Price API</button> 
+	</h3> -->
+	
+	<!-- <h5 ng-show="calledRemoteSuccessfully">
+		Backend failed to call Eve Marketdata. Sorry.
+		Stats below are Jita 5% Buy from  
+		<a href='http://eve-marketdata.com/browse_market.php?marketgroup_id=1332'>
+			Eve Marketdata
+		</a> 
+		on 5/25/2015.
+		<br>
+		Click a price to edit it.
+		<button type="btn btn-success" ng-click="populatePriceMap()">Try Again</button>
+	</h5>
+	
+	<div ng-hide="calledRemoteSuccessfully"> -->
+	<div>
+		<div>Import Stats: Using {{im_marketStatType}} {{im_orderType}} orders from {{marketHubList[importMarketSystem]}} </div>
+		<div>Export Stats: Using {{ex_marketStatType}} {{ex_orderType}} orders from {{marketHubList[exportMarketSystem]}} </div>
+		<!-- updateMarketPricesByQualifiers , populatePriceMap -->
+		<div>
+			<a data-toggle="collapse" data-target="#importOptions">Show Import Options</a>
+			<form class="form-inline collapse out" id="importOptions">
+			<row>
+				<div class="input-group input-group-sm col-md-11">
+					<span class="input-group-addon" id="inport-marketHub-descriptor">Market Hub</span>
+					<select class="input form-control" style="width:auto"
+						id="import-marketHub-input"
+						ng-options="key as value for (key, value) in marketHubList"
+						ng-model="importMarketSystem"
+						aria-describedby="import-marketHub-descriptor"
+						ng-change="populatePriceMap()">
+					</select>
+				</div>
+				<div class="input-group input-group-sm col-md-5">
+				  	<span class="input-group-addon" id="import-ordertype-descriptor">Order Type</span>
+				  	<select class="input form-control" style="width:auto"
+						id="import-orderType-input"
+						ng-model="im_orderType"
+						ng-options="o as o for o in orderTypeList | orderBy"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="import-ordertype-descriptor">
+					</select>
+				</div>
+				
+				<div class="input-group input-group-sm col-md-5">
+					<span class="input-group-addon" id="import-marketstat-descriptor">Market Stat</span>
+					<select class="input form-control" style="width:auto"
+						id="import-marketStat-input"
+						ng-model="im_marketStatType"
+						ng-options="o as o for o in marketStatTypeList | orderBy"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="import-marketstat-descriptor"></select>
+				</div>
+			</row>
+			<row>
+				<div class="input-group input-group-sm col-md-5">
+					<span class="input-group-addon" id="import-brokerfees-descriptor">Broker Fees</span>
+					<input class="input form-control" style="width: 40px"
+						id="import-brokerfees-input"
+						ng-model="im_brokerfees"
+						min="0" max="100"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="import-brokerfees-descriptor"/>
+				</div>
+				<div class="input-group input-group-sm col-md-5">
+					<span class="input-group-addon" id="import-salestax-descriptor">Sales Tax</span>
+					<input class="input form-control" style="width: 40px"
+						id="import-salestax-input"
+						ng-model="im_salestax"
+						min="0" max="100"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="import-salestax-descriptor"/>
+				</div>
+			</row>
+			</form>
+		</div>
+		
+		<div>
+			<a data-toggle="collapse" data-target="#exportOptions">Show Export Options</a>
+			<form class="form-inline collapse out" id="exportOptions">
+			<row>
+				<div class="input-group input-group-sm col-md-11">
+					<span class="input-group-addon" id="export-marketHub-descriptor">Market Hub</span>
+					<select class="input form-control" style="width:auto"
+						id="export-marketHub-input"
+						ng-options="key as value for (key, value) in marketHubList"
+						ng-model="exportMarketSystem"
+						aria-describedby="export-marketHub-descriptor"
+						ng-blur="populatePriceMap()">
+					</select>
+				</div>
+				<div class="input-group input-group-sm col-md-5">
+				  	<span class="input-group-addon" id="export-ordertype-descriptor">Order Type</span>
+				  	<select class="input form-control" style="width:auto"
+						id="export-orderType-input"
+						ng-model="ex_orderType"
+						ng-options="o as o for o in orderTypeList | orderBy"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="export-ordertype-descriptor">
+					</select>
+				</div>
+				
+				<div class="input-group input-group-sm col-md-5">
+					<span class="input-group-addon" id="export-marketstat-descriptor">Market Stat</span>
+					<select class="input form-control" style="width:auto"
+						id="export-marketStat-input"
+						ng-model="ex_marketStatType"
+						ng-options="o as o for o in marketStatTypeList | orderBy"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="export-marketstat-descriptor"></select>
+				</div>
+			</row>
+			<row>
+				<div class="input-group input-group-sm col-md-5">
+					<span class="input-group-addon" id="export-brokerfees-descriptor">Broker Fees</span>
+					<input class="input form-control" style="width: 40px"
+						id="export-brokerfees-input"
+						ng-model="ex_brokerfees"
+						min="0" max="100"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="export-brokerfees-descriptor"/>
+				</div>
+				<div class="input-group input-group-sm col-md-5">
+					<span class="input-group-addon" id="export-salestax-descriptor">Sales Tax</span>
+					<input class="input form-control" style="width: 40px"
+						id="export-salestax-input"
+						ng-model="ex_salestax"
+						min="0" max="100"
+						ng-change="updateMarketPricesByQualifiers()"
+						aria-describedby="export-salestax-descriptor"/>
+				</div>
+			</row>
+			</form>
+		</div>
+		
+		
+<!-- 		<button type="button" class="btn btn-danger" data-toggle="collapse" data-target="#sample">Collapse/Expand</button>
+		
+		<div id="sample" class="collapse out">Content goes here</div>
+ -->		
+		
+		
+		
+	</div> <!-- Called Remote Successfully -->
+	<h5>By Type</h5>
+	<table class="table table-condensed" >
+		<tr>
+			<th>Item</th>
+			<th>Units/Day</th>
+			<th>Local Vol/Day</th>
+			<th>Price 
+				<span tooltip="{{priceMessage}}" tooltip-placement="auto">
+					<span class="glyphicon glyphicon-question-sign"></span>
+				</span>
+			</th>
+		</tr>
+		<tr ng-repeat="item in totalImportExport" ng-if="item.quantity < 0" class="importColors">
+			<td>{{data.itemDetails[item.typeID].name}}</td>
+			<td>{{item.quantity * -1 * 24 | number}}</td>
+			<td>{{realMarketPrices[item.typeID][importMarketSystem][im_orderType].volume | number}}</td>
+			<td> <!-- ng-if="!item.edit" ng-click="item.edit = true">-->
+				{{realMarketPrices[item.typeID][importMarketSystem][im_orderType][im_marketStatType] | number}}
+			</td>
+			<!-- 
+			<td ng-if="item.edit">
+				<form class="form-inline borderColors">
+					<input type="text" class="pull-left editTypeBox" ng-model="marketPrices[item.typeID].price" 
+						style="font-size:12px">
+					<span class="input-group-btn pull-left">
+						<button ng-click="item.edit = false; updateTotalImportExportCost()" 
+							class="btn btn-primary btn-xs">
+							<span class="glyphicon glyphicon-ok"></span>
+						</button>
+					</span>
+				</form>
+			</td>-->
+		</tr>
+		<tr></tr>
+		<tr ng-repeat="item in totalImportExport" ng-if="item.quantity > 0" class="exportColors">
+			<td>{{data.itemDetails[item.typeID].name}}</td>
+			<td>{{item.quantity * 24 | number}}</td>
+			<td>{{realMarketPrices[item.typeID][exportMarketSystem][ex_orderType].volume | number}}</td>
+			<td> <!-- ng-if="!item.edit" ng-click="item.edit = true"> -->
+				{{realMarketPrices[item.typeID][exportMarketSystem][ex_orderType][ex_marketStatType] | number}}
+			</td>
+			<!-- 
+			<td ng-if="item.edit">
+				<form class="form-inline borderColors">
+					<input type="text" class="pull-left editTypeBox" ng-model="marketPrices[item.typeID].price" 
+						style="font-size:12px">
+					<span class="input-group-btn pull-left">
+						<button ng-click="item.edit = false; updateTotalImportExportCost()" 
+							class="btn btn-primary btn-xs">
+							<span class="glyphicon glyphicon-ok"></span>
+						</button>
+					</span>
+				</form>
+			</td>
+			-->
+		</tr>
+	</table>
+	
+	<h5>Summary</h5>
+	<table class = "table table-superCondensed">
+		<tr>
+			<td>Total Hourly Export Profit</td>
+			<td></td>
+			<td class="exportColors pull-right">{{totalExportRevenue | number:2}} isk</td>
+		</tr>
+		<tr>
+			<td>Export Market Fees</td>
+			<td>-</td>
+			<td class="importColors pull-right">{{exportMarketFees | number:2}} isk</td>
+		</tr>
+		<tr>
+			<td>Total Hourly Import Cost</td>
+			<td>-</td>
+			<td class="importColors pull-right">{{totalImportCost | number:2}} isk </td>
+		</tr>
+		<tr>
+			<td>Import Market Fees</td>
+			<td>-</td>
+			<td class="importColors pull-right">{{importMarketFees | number:2}} isk</td>
+		</tr>
+		<tr>
+			<td>Total Hourly Customs Tax</td>
+			<td>-</td>
+			<td class="importColors pull-right">{{totalTaxCost | number:2}} isk</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td></td>
+			<td style="border-color: grey; padding: 5px"></tr>
+		<tr>
+			<td>Profit Per Hour</td>
+			<td></td>
+			<td class="pull-right" ng-class="totalProfitPerHour > 0 ? 'exportColors' : 'importColors'">{{totalProfitPerHour | number:2}} isk</td>
+		</tr>
+		<tr>
+		</tr>
+	</table>
+	<h5>Profit per hour: {{totalProfitPerHour | number:2}}</h5>
+	<h5>Profit/day: {{totalProfitPerHour * 24 | number:2}}</h5>
+	</div>
+
+	
+
+	<div class="col-xs-4 infoPanel infoPanelMiddle">
+		<h2 class="pull-right">
+			<button class="btn btn-success" 
+				ng-click="importsNotProfits = importsNotProfits * -1">
+				Swap
+			</button>
+		</h2>
+		
+		<!-- Import Export list, gives amounts and destinations -->
+		<span ng-show="importsNotProfits > 0">
+			<h2 class="headerTextColor">Resupply Summary</h2>
+			<table class="table table-condensed" style="border-top:0px">
+				<tr>
+					<th>Item</th>
+					<th>Hourly</th>
+					<th>System Run</th>
+					<th>Maximum</th>
+				<tr ng-repeat-start="p in planets">
+					<td><h4>{{p.text}}</h4></td>
+					<td/><td/><td/>
+				</tr>
+				<tr ng-repeat="item in p.importExport" ng-if="item.quantity < 0" class="importColors">
+						<td>{{data.itemDetails[item.typeID].name}}</td>
+					<td>{{item.quantity * -1 | number:2 | number}}</td>
+					<td>{{item.quantity * minRuntime * -1 | number}}</td>
+					<td>{{item.quantity * p.runtime * -1 | number}}</td>
+				</tr>
+				<tr></tr>
+				<tr ng-repeat="item in p.importExport" ng-if="item.quantity > 0" class="exportColors"
+					ng-repeat-end>
+					<td>{{data.itemDetails[item.typeID].name}}</td>
+					<td>{{item.quantity | number:2 | number}}</td>
+					<td>{{item.quantity * minRuntime | number}}</td>
+					<td>{{item.quantity * p.runtime | number}}</td>
+				</tr>
+			</table>
+		</span>
+		
+		<!-- Profit view, gives visibility into per-planet profit -->
+		<span ng-hide="importsNotProfits > 0">
+			<h2 class="headerTextColor">Profit Summary</h2>
+			<table class="table table-superCondensed" style="border-top:0px">
+				<tr ng-repeat-start="p in planets">
+					<td><h4>{{p.text}}</h4></td>
+					<td/><td/><td/>
+				</tr>
+				<tr ng-repeat="item in p.importExport" ng-if="item.quantity>0">
+					<td>
+						{{data.itemDetails[item.typeID].name}}
+					</td>
+					<td class="exportColors pull-right">
+						{{realMarketPrices[item.typeID][exportMarketSystem][ex_orderType][ex_marketStatType] 
+							* item.quantity | number:2}}
+					</td>
+				</tr>
+				<tr ng-repeat="item in p.importExport" ng-if="item.quantity<0">
+					<td>
+						{{data.itemDetails[item.typeID].name}}
+					</td>
+					<td class="importColors pull-right">
+						{{realMarketPrices[item.typeID][importMarketSystem][im_orderType][im_marketStatType] 
+							* item.quantity * -1 | number:2}}
+					</td>
+				</tr>
+				<tr>
+					<td>POCO Taxes</td>
+					<td class="importColors pull-right">
+						{{p.importTaxes + p.exportTaxes | number:2}}
+					</td>
+				</tr>
+				<tr><td/><td style="border-color: grey; padding: 5px"/></tr>
+				<tr>
+					<td>Export Revenue</td>
+					<td class="pull-right" ng-class="p.exportRevenueValue > 0 ? 'exportColors' : 'importColors'">
+						{{p.exportRevenueValue | number:2}}
+					</td>
+				</tr>
+				<tr>
+					<td>Import Cost</td>
+					<td class="pull-right" ng-class="p.totalProfit > 0 ? 'exportColors' : 'importColors'">
+						{{p.importCostValue | number:2}}
+					</td>
+				</tr>
+				<tr>
+					<td>Planet Profit before Market Fees</td>
+					<td class="pull-right" ng-class="p.exportRevenueValue - p.importCostValue > 0 ? 'exportColors' : 'importColors'">
+						{{p.exportRevenueValue - p.importCostValue | number:2}}
+					</td>
+				</tr>
+				<tr><td/><td style="border-color: grey; padding: 5px"/></tr>
+				<tr>
+					<td>Export Market Fees</td>
+					<td class="importColors pull-right">
+						{{p.exportMarketFees | number:2}}
+					</td>
+				</tr>
+				<tr>
+					<td>Import Market Fees</td>
+					<td class="importColors pull-right">
+						{{p.importMarketFees | number:2}}
+					</td>
+				</tr>
+				<tr >
+					<td>Planet Profit after Market Fees</td>
+					<td class="pull-right" 
+						ng-class="p.exportRevenueValue - (p.importCostValue + p.exportMarketFees 
+							+ p.importMarketFees + p.importTaxes + p.exportTaxes) > 0 ? 'exportColors' : 'importColors'">
+						{{p.exportRevenueValue - (p.importCostValue + p.exportMarketFees 
+							+ p.importMarketFees + p.importTaxes + p.exportTaxes) | number:2}}
+					</td>
+				</tr>
+				<tr ng-repeat-end>
+					<td style="border-color: grey; padding: 5px"/><td style="border-color: grey; padding: 5px"/>
+				</tr>
+			</table>
+			
+		</span>
+		
+	</div>
+
+	<div class="col-xs-4 infoPanel infoPanelRight">
+		<h2 class="headerTextColor">Warnings and Info</h2>
+		<div class="row infoPanelPlanetDisplay" ng-repeat="p in planets">
+			<h3 class="headerTextColor">{{p.text}}</h3>
+			<div class="row">
+				<div class="col-xs-12">Possible Planet Types</div>
+				<div class="col-xs-3 planetTypes" ng-repeat="pt in p.allowedPlanets">
+					{{planetShorthand[pt]}}
+					<!-- note I don't have planet names yet -->
+				</div>
+			</div>
+			<div>Tax Rate = {{p.taxRate}}%</div>
+			<div>
+				Total runtime is {{p.runtime}} hours ({{p.runtime/24|number}} days) 
+				<span ng-show="p.runtime * p.avgActiveCycles == minRuntime" class="errorText">
+					Bottleneck: Shortest Runtime
+				</span>
+			</div>
+			<div ng-show="p.importVolume > p.exportVolume">
+				Planet is <span class="importColors">IMPORT</span> limited
+			</div>
+			<div ng-show="p.importVolume < p.exportVolume">
+				Planet is <span class="exportColors">EXPORT</span> limited
+			</div>
+			<div ng-show="p.avgActiveCycles > 1">
+				Factory Planet active every {{p.avgActiveCycles|number}} cycles ({{1/p.avgActiveCycles|number}}%) 
+			</div>
+			<!-- {{p.CPU|number:1}}/{{cclevel[p.level].CPU|number:0}}tf -->
+			<div class="errorText" ng-show="p.CPU > cclevel[p.level].CPU">
+				CPU usage is {{p.CPU/cclevel[p.level].CPU * 100 | number:1}}%!
+			</div>
+			<div class="errorText" ng-show="p.Powergrid > cclevel[p.level].Power">
+				Powergrid usage is {{p.Powergrid/cclevel[p.level].Power * 100 | number:1}}%!
+			</div>
+			<div ng-show="p.avgActiveCycles == 1 && p.importVolume > 0" class="errorText">
+				Has imports and 100% utilization! 
+			</div>
+			<div ng-show="p.avgActiveCycles < 1" class="errorText">
+				Planet is active more than 100% of the time. No, that's not possible. Fix it.
+			</div>
+			<div ng-hide="p.launchpads" class="errorText">Planet has no launchpads!</div>
+		</div>
+	</div>
+</div>

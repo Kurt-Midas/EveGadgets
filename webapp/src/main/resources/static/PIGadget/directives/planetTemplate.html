@@ -1,0 +1,495 @@
+<div> 
+
+	<nav class="col-xs-3 bs-docs-sidebar barColors mySidebar borderColors" style="position: fixed">
+		<!-- <h4>System Information</h4> -->
+		<!-- <h5>This setup has {{planets.length}} planets</h5> -->
+		<h5 ng-show="minRuntime != 100000">Minimum Runtime: {{minRuntime}}</h5>
+		<h5 ng-hide="minRuntime != 100000">No Minimum Runtime Information</h5>
+		<h5>Total Setup Cost: {{totalCost | number:0}} isk</h5>
+		<h5>Total Tax Cost of One Cycle: {{totalTaxCost | number:2}} isk</h5>
+		<table class="table table-condensed" >
+			<tr>
+				<th>Item</th>
+				<th>Hourly</th>
+				<th>Max Run</th>
+				<th>P.IDs</th>
+			</tr>
+			<tr ng-repeat="item in totalImportExport" ng-if="item.quantity < 0" class="importColors">
+				<td>{{data.itemDetails[item.typeID].name}}</td>
+				<td>{{item.quantity * -1  | number}} </td>
+				<td>{{item.quantity * minRuntime * -1 | number}}</td>
+				<td>{{item.planets}}</td>
+			</tr>
+			<tr></tr>
+			<tr ng-repeat="item in totalImportExport" ng-if="item.quantity > 0" class="exportColors">
+				<td>{{data.itemDetails[item.typeID].name}}</td>
+				<td>{{item.quantity | number}}</td>
+				<td>{{item.quantity * minRuntime | number}}</td>
+				<td>{{item.planets}}</td>
+			</tr>
+		</table>
+    </nav>
+
+	<div class="col-xs-9 col-xs-offset-3">
+		<div class="customHeader col-md-10">
+			<h2 class="interactableColor">
+				<span ng-hide="p.editText" class="col-md-10"
+						ng-click="p.editText=1">
+					<span>{{p.text}}</span>
+					<small tooltip="{{clickMeMessage}}" tooltip-placement="auto">
+						<span class="glyphicon glyphicon-question-sign"></span>
+					</small>
+				</span>
+				<form ng-show="p.editText" class="form-inline col-md-11">
+					<input type="text" class="form-control pull-left" ng-model="p.text" 
+						style="font-size:18px">
+					<span class="input-group-btn pull-left">
+						<button ng-click="p.editText = 0" class="btn btn-primary">
+						<span class="glyphicon glyphicon-ok"></span></button>
+					</span>
+				</form>
+				
+				<span class="col-md-1">
+					<button ng-click="createPlanetFromCopy(p, '-clone')" class="btn btn-success btn-sm pull-right">
+						Copy Setup
+					</button>
+				</span>
+				
+				<span class="col-md-1">
+					<button ng-click="removePlanet(p); $scope.updateTotalImportExport()" class="btn btn-danger btn-sm pull-right">
+						<span class="glyphicon glyphicon-remove"></span>
+					</button>
+				</span>
+			</h2>
+		</div>
+		
+		<!-- Info Panel -->
+		<div class="col-xs-6" style="padding-left:4px">
+		
+			<div class="row">
+				<div class="col-xs-12">Possible Planet Types</div>
+				<div class="col-xs-3 planetTypes" ng-repeat="pt in p.allowedPlanets">
+					{{planetShorthand[pt]}}
+					<!-- note I don't have planet names yet -->
+				</div>
+			</div><br>
+		
+			<div class="col-xs-6">
+				<div class="barContainer">
+					<div class="row">
+						Resupply Interval: {{p.runtime}}
+						<span style="float:right">{{p.runtime/24 | number:1}} days</span>
+						</div>
+						<div class="progress row">
+						  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="24" 
+							aria-valuemin="0" aria-valuemax="{{p.runtime}}" 
+							ng-style="{'width' : 24/p.runtime * 100 + '%'}">
+						  </div>
+						</div>
+					<div class="row">Cost: {{p.cost | number:0}} ISK</div>
+				</div>
+			</div>
+			
+			<div class="col-xs-6" style="padding-right:4px">
+				<div class="barContainer">
+					<div class="row">
+						CPU: {{p.CPU/cclevel[p.level].CPU * 100 | number:1}}%
+						
+						<span class="pull-right">
+							{{p.CPU|number:1}}/{{cclevel[p.level].CPU|number:0}}tf
+						</span>
+					</div>
+					<div class="progress row">
+					  <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="{{p.CPU}}" 
+						aria-valuemin="0" aria-valuemax="{{cclevel[p.level].CPU}}" 
+						ng-style="{width : p.CPU/cclevel[p.level].CPU * 100 + '%' }"
+						ng-class="{'progress-bar-striped active': IsBigger(p.CPU, cclevel[p.level].CPU)}">
+					  </div>
+					</div>
+					<div class="row">
+						Power: {{p.Powergrid/cclevel[p.level].Power * 100 | number:1}}%
+						<span class="pull-right">
+							{{p.Powergrid|number:1}}/{{cclevel[p.level].Power|number:0}}gw
+						</span>
+					</div>
+					<div class="progress row">
+						  <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="{{p.Powergrid}}" 
+							aria-valuemin="0" aria-valuemax="{{cclevel[p.level].Power}}" 
+							ng-style="{width : p.Powergrid/cclevel[p.level].Power * 100 + '%'}"
+							ng-class="{'progress-bar-striped active': IsBigger(p.Powergrid, cclevel[p.level].Power)}">
+						  </div>
+					</div>
+				</div>
+			</div>
+			
+			<h5>Command Center Level</h5>
+			<div class="btn-group btn-group-justified interactableColor" role="group" aria-label="cclevel" ng-click="p.updateCost()">
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=0" ng-class="{'btn-primary' : p.level >= 0}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=1" ng-class="{'btn-primary' : p.level >= 1}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=2" ng-class="{'btn-primary' : p.level >= 2}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=3" ng-class="{'btn-primary' : p.level >= 3}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=4" ng-class="{'btn-primary' : p.level >= 4}"></button>
+				</div>
+				<div class="btn-group" role="group">
+					<button class="btn btn-default" type="button" ng-click="p.level=5" ng-class="{'btn-primary' : p.level >= 5}"></button>
+				</div>
+			</div>
+			<!-- Use border-color, it's noticeable. Also border-radius:0 -->
+			
+			<table class="table table-condensed" style="border-top:0px">
+				<tr>
+					<th>Item</th>
+					<th>Hourly</th>
+					<th>Per Run</th>
+					<th>Taxes/Hour</th>
+				</tr>
+				<tr ng-repeat="item in p.importExport" ng-if="item.quantity < 0" class="importColors">
+					<td>{{data.itemDetails[item.typeID].name}}</td>
+					<td>{{item.quantity * -1 | number}} </td>
+					<td>{{item.quantity * p.runtime * -1 | number:0}}
+					<td>{{(costByTier[data.itemDetails[item.typeID].tier] * item.quantity * p.taxRate / 100 * -1) | number}}</td>
+					<!-- <td>{{costByTier[data.itemDetails[item.typeID].tier]}} {{item.quantity}}  {{p.taxRate / 100 * -1}}</td> -->
+				</tr>
+				<tr></tr>
+				<tr ng-repeat="item in p.importExport" ng-if="item.quantity > 0" class="exportColors">
+					<td>{{data.itemDetails[item.typeID].name}}</td>
+					<td>{{item.quantity | number}}</td>
+					<td>{{item.quantity * p.runtime | number:0}}</td>
+					<td>{{(costByTier[data.itemDetails[item.typeID].tier] * item.quantity * p.taxRate / 100) | number}}</td>
+				</tr>
+			</table>
+		</div>
+		
+		<!-- Interaction Panel -->
+		<div class="col-xs-6">
+		
+			<div class="row">
+				<h4 >Add Basic Factory
+				<button class="btn btn-primary btn-sm" ng-click="
+				p.addBasic(); p.updateCPU(); p.updateGrid(); p.updateCost()
+				" >Basic</button>
+				</h4>  
+				<div class="input-group input-group-sm" ng-repeat="f in p.basics">
+				
+					<!-- Delete Factory Button -->
+					<span class="input-group-btn">
+						<button class="btn btn-danger" ng-click=
+							"removeElementFrom(f, p.basics);
+							p.updateCPU();
+							p.updateGrid();
+							p.updateCost();
+							p.updateImportExports()">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</span>
+					
+					<!-- Select Datalist -->
+					<select class="input form-control" style="width:auto"
+						ng-model="f.schematic"
+						ng-options="o as o for o in basicTypeList | orderBy"
+						ng-change="p.updateImportExports()"></select>
+			
+					<!-- Number Buttons -->
+					<span class="input-group input-group-sm">
+					  <span class="input-group-btn">
+						  <button type="button" class="btn btn-default btn-number" ng-if="f.number>0" ng-click="
+							f.number = f.number-1;
+							p.updateCPU();
+							p.updateCost();
+							p.updateGrid();
+							p.updateImportExports()
+							">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+						  <button type="button" class="btn btn-disabled btn-number" ng-if="!f.number>0">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+					  </span>
+					  <input type="number" ng-model="f.number" class="form-control input-number pull-left" 
+						style="width:50px" maxlength="2" ng-blur="
+							p.updateCPU();
+							p.updateCost();
+							p.updateGrid();
+							p.updateImportExports()"> 
+						<!-- min="1" max="10" style="width:30px" maxlength=2> -->
+					  <span class="input-group-btn pull-left">
+						  <button type="button" class="btn btn-default btn-number pull-left"
+							 ng-click="f.number = f.number + 1;
+							 p.updateCPU();
+							p.updateGrid();
+							p.updateCost();
+							p.updateImportExports()">
+							  <span class="glyphicon glyphicon-plus"></span>
+						  </button>
+					  </span>
+					  
+					  <span ng-if="p.isFactoryPlanet">
+							<input type="number" ng-model=f.avgActiveCycles 
+							class="form-control input-number input-sm utilizationField"
+							ng-blur="p.updateImportExports()">
+					  </span>
+					
+					</span><!-- Number input -->
+				</div><!-- Input Group repeat -->
+			</div>
+			
+			<div class="row">
+				<h4 >Add Advanced Factory
+				<button class="btn btn-primary btn-sm" ng-click="
+				p.addAdvanced(); p.updateCPU(); p.updateGrid(); p.updateCost()
+				" >Advanced</button>
+				</h4>  
+				<div class="input-group input-group-sm" ng-repeat="f in p.advanced">
+				
+					<span class="input-group-btn">
+						<button class="btn btn-danger" ng-click=
+							"removeElementFrom(f, p.advanced);
+							p.updateCPU();
+							p.updateGrid();
+							p.updateCost();
+							p.updateImportExports()">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</span>
+					<select class="input form-control" style="width:auto"
+						ng-model="f.schematic"
+						ng-options="o as o for o in advancedTypeList | orderBy"
+						ng-change="p.updateImportExports()"></select>
+			
+				  <span class="input-group input-group-sm">
+					  <span class="input-group-btn">
+						  <button type="button" class="btn btn-default btn-number" ng-if="f.number>0" ng-click="
+							f.number = f.number-1;
+							p.updateCPU();
+							p.updateCost();
+							p.updateGrid();
+							p.updateImportExports()
+							">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+						  <button type="button" class="btn btn-disabled btn-number" ng-if="!f.number>0">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+					  </span>
+					  <input type="number" ng-model="f.number" class="form-control input-number pull-left" 
+						style="width:50px" maxlength="2" ng-blur="
+							p.updateCPU();
+							p.updateCost();
+							p.updateGrid();
+							p.updateImportExports()"> 
+						<!-- min="1" max="10" style="width:30px" maxlength=2> -->
+					  <span class="input-group-btn pull-left">
+						  <button type="button" class="btn btn-default btn-number pull-left"
+							 ng-click="f.number = f.number + 1;
+							 p.updateCPU();
+							p.updateGrid();
+							p.updateCost();
+							p.updateImportExports()">
+							  <span class="glyphicon glyphicon-plus"></span>
+						  </button>
+					  </span>
+					  
+					  <span ng-if="p.isFactoryPlanet">
+							<input type="number" ng-model=f.avgActiveCycles 
+							class="form-control input-number input-sm utilizationField"
+							ng-blur="p.updateImportExports()">
+					  </span>
+					</span>
+					
+				</div>
+			</div>
+			
+			<div class="row">
+				<h4 >Add High Tech Factory
+				<button class="btn btn-primary btn-sm" ng-click="p.addHighTech(); p.updateCPU(); 
+				p.updateGrid(); p.updateCost(); p.updateAllowedPlanets()">
+					High Tech
+				</button>
+				</h4>  
+				<div class="input-group input-group-sm" ng-repeat="f in p.hightech">
+				
+					<span class="input-group-btn">
+						<button class="btn btn-danger" ng-click=
+							"removeElementFrom(f, p.hightech);
+							p.updateCPU();
+							p.updateGrid();
+							p.updateCost();
+							p.updateImportExports();
+							p.updateAllowedPlanets()">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</span>
+					<select class="input form-control" style="width:auto"
+						ng-model="f.schematic"
+						ng-options="o as o for o in hightechTypeList | orderBy"
+						ng-change="p.updateImportExports()"></select>
+					
+					<span class="input-group input-group-sm">
+					  <span class="input-group-btn">
+						  <button type="button" class="btn btn-default btn-number" ng-if="f.number>0" ng-click="
+							f.number = f.number-1;
+							p.updateCPU();
+							p.updateCost();
+							p.updateGrid();
+							p.updateImportExports()
+							">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+						  <button type="button" class="btn btn-disabled btn-number" ng-if="!f.number>0">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+					  </span>
+					  <input type="number" ng-model="f.number" class="form-control input-number pull-left" 
+						style="width:50px" maxlength="2" ng-blur="
+							p.updateCPU();
+							p.updateCost();
+							p.updateGrid();
+							p.updateImportExports()"> 
+						<!-- min="1" max="10" style="width:30px" maxlength=2> -->
+					  <span class="input-group-btn pull-left">
+						  <button type="button" class="btn btn-default btn-number pull-left"
+							 ng-click="f.number = f.number + 1;
+							 p.updateCPU();
+							p.updateGrid();
+							p.updateCost();
+							p.updateImportExports()">
+							  <span class="glyphicon glyphicon-plus"></span>
+						  </button>
+					  </span>
+				  
+					  <span ng-if="p.isFactoryPlanet">
+							<input type="number" ng-model=f.avgActiveCycles 
+							class="form-control input-number input-sm utilizationField"
+							ng-blur="p.updateImportExports()">
+					  </span>
+				  </span>	
+				</div>
+			</div>
+			
+			<div class="row">
+				<h4 >
+				Extractors:  
+				<button class="btn btn-primary btn-sm" ng-click="p.addExtractor(); p.updateCPU(); p.updateGrid()">
+					Extractor
+				</button>
+				</h4>
+				<div class="input-group input-group-sm" ng-repeat="e in p.extractors">
+					<span class="input-group-btn">
+						<button class="btn btn-danger" style="float:left;"
+						 ng-click="removeElementFrom(e, p.extractors); p.updateCPU(); p.updateGrid();
+						 p.updateImportExports(); p.updateAllowedPlanets()">
+							<span class="glyphicon glyphicon-remove"></span>
+						</button>
+					</span>
+				
+					<select class="input form-control" style="width:auto"
+						ng-model="e.resourceId"
+						ng-options="o as o for o in p.resourceDatalist | orderBy"
+						ng-change="p.updateImportExports(); p.updateAllowedPlanets()"></select>	
+					
+					<span class="input-group input-group-sm">
+						<span class="input-group-btn">
+						  <button type="button" class="btn btn-default btn-number" ng-show="e.headcount" 
+						  ng-click="e.headcount = e.headcount-1; p.updateCPU(); p.updateGrid()">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+						  <button type="button" class="btn btn-disabled btn-number" ng-hide="e.headcount">
+							  <span class="glyphicon glyphicon-minus"></span>
+						  </button>
+					  </span>
+					  <input type="number" ng-model="e.headcount" class="form-control input-number pull-left" style="width:60px"
+						ng-blur="p.updateCPU(); p.updateGrid()" ng-hide="e.headcount == 0">
+					  <input class="form-control input-number pull-left" style="width:60px" placeholder="Heads" ng-show="e.headcount == 0"
+						ng-click="e.headcount = 1">
+					  <span class="input-group-btn pull-left" style="float:left">
+						  <button type="button" class="btn btn-default" ng-click="e.headcount = e.headcount+1; p.updateCPU(); p.updateGrid()"
+							 ng-show="e.headcount < 10">
+							  <span class="glyphicon glyphicon-plus"/>
+						  </button>
+						  <button type="button" class="btn btn-default btn-disabled"
+							 ng-hide="e.headcount < 10">
+							  <span class="glyphicon glyphicon-plus"/>
+						  </button>
+					  </span>
+					</span>
+				</div>
+			</div>
+			
+			
+			<h5 class="row">
+				<span>
+				Storage
+				<button class="btn btn-xs" 
+					ng-class="p.storagefacilities > 0 ? 'btn-primary' : 'btn-disabled'"
+					ng-click="p.removeStorage()" >
+					<span class="glyphicon glyphicon-minus"/>
+				</button>
+				<span class="facilitiesDisplay">{{p.storagefacilities}}</span>
+				<button ng-click="p.addStorage()"
+					class="btn btn-primary btn-xs">
+					<span class="glyphicon glyphicon-plus"/>
+				</button>
+				</span>
+				
+				<span style="margin-left:10px">
+				Launchpads
+				<button ng-click="p.removeLaunchpad()" class="btn btn-xs"
+					ng-class="p.launchpads > 0 ? 'btn-primary' : 'btn-disabled'">
+					<span class="glyphicon glyphicon-minus"/>
+				</button>
+				<span class="facilitiesDisplay">{{p.launchpads}}</span>
+				<button ng-click="p.addLaunchpad()"
+					class="btn btn-primary btn-xs">
+					<span class="glyphicon glyphicon-plus"/>
+				</button>
+				</span>
+			</h5>
+		
+			<h5 class="row">Tax Rate %: <input type="text" class="form-control input-sm" ng-model="p.taxRate" 
+				style="width:40px; display:inline; line-height:1; height:22px" min="0" max="100" maxlength=3 ng-change="p.updateTaxes()">
+			</h5>
+			
+			<h5 class="row">
+				Avg Link Length: <input type="text" class="form-control input-sm" ng-model="p.AvgLinkLength" ng-blur="p.updateCPU(); p.updateGrid()"
+					style="width:80px; display:inline; line-height:1">
+				<a tooltip="This must be estimated. This can be 10K+ for Gas planets, so don't ignore it" tooltip-placement="auto">
+					<span class="glyphicon glyphicon-question-sign"></span>
+				</a>
+			</h5>
+			
+			<h5 class="row">
+				Use Command Center for Storage <input type="checkbox" ng-model="p.useCCStorage"
+				ng-change="p.updateCPU(); p.updateGrid(); p.updateStorage()">		
+			</h5>
+			<h5 class="row">
+				Imports/Exports only use Launchpads <input type="checkbox" ng-model="p.restrictPads"
+				ng-change="p.updateStorage()">
+			</h5>
+			<h5 class="row">
+				Partial Utilization <input type="checkbox" ng-model="p.isFactoryPlanet">
+				
+				<span ng-if="p.isFactoryPlanet">
+					Planet is active every
+					<input type="number" ng-model="p.avgActiveCycles" class="form-inline input-sm utilizationField" 
+					ng-change="p.updateImportExports()"
+					style="margin-left: initial">
+						cycles
+				</span>
+				<a tooltip="{{utilizationMessage}}" tooltip-placement="auto">
+					<span class="glyphicon glyphicon-question-sign"></span>
+				</a>
+			</h5>
+		</div>
+	</div>
+
+</div>
+		

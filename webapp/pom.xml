@@ -17,6 +17,11 @@
 			<artifactId>planetary</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.evegadgets.gadgets</groupId>
+			<artifactId>priceutils</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>  
 	
 	

@@ -5,7 +5,7 @@ var app = angular.module('planetApp', ['ui.bootstrap',
 app.config(function($routeProvider, $httpProvider) {
 	$routeProvider.
 		when('/', {
-			templateUrl: 'PIApp.html',
+			templateUrl: 'PIGadget/PIApp.html',
 			controller: 'planetAppController'
 		}).
 //		when('/FAQ', {
@@ -28,7 +28,7 @@ app.config(function($routeProvider, $httpProvider) {
 app.directive('variableHeight', function(){
 	return {
 		link: function(scope, element){
-			console.log(element[0].offsetHeight);
+//			console.log(element[0].offsetHeight);
 		}
 	};
 });
@@ -49,6 +49,9 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 	$scope.minRuntime = 100000;
 	$scope.totalImportCost = 0;
 	$scope.totalExportCost = 0;
+	$scope.totalImportMarketFees = 0;
+	$scope.totalExportMarketFees = 0;
+	$scope.totalProfitPerHour = 0;
 	
 	$scope.totalImportExport = {};
 	
@@ -58,13 +61,10 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 	$scope.clickMeMessage = 
 		'Click the planet name to edit it';
 	$scope.priceMessage = 'Click a price to edit';
+	$scope.importsNotProfits = 1;
+	$scope.brokerFees = 1;
+	$scope.localTaxes = 1.5;
 	
-	$rootScope.contactMessage = 'IGN: Kurt Midas <br>'
-		+ "<a href='https://github.com/Kurt-Midas/EveGadgets' " +
-				"target='_blank'>Project Github</a><br>"
-		+ "<a href='https://secure.eveonline.com/trial/?invc=9e8adfef-08b9-486c-b43b-c8733b49e46a&action=buddy'" +
-				" target='_blank'>Make a PI account and stuff</a><br>"
-		+ "SEND ME FEEDBACK AND ILL DOUBLE IT FOR FREE CHECK MY BIO";
 	
 	$scope.buildings=({
 		Extractor_Control_Unit:{CPU:400,Power:2600,Cost:45000},
@@ -104,7 +104,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 	$scope.hightechTypeList = [];
 	
 	function populateDatalists(){
-		console.log("Creating datamaps");
+//		console.log("Creating datamaps");
 		angular.forEach($scope.data.schematicMap, function(sch){
 			if(sch.marketGroup == 1334){
 				$scope.basicTypeList.push(sch.name);
@@ -116,7 +116,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				$scope.hightechTypeList.push(sch.name);
 			}
 			else{
-				console.log("Unknown marketGroup at <"+sch.name+", " + sch.marketGroup + ">");
+				console.error("Unknown marketGroup at <"+sch.name+", " + sch.marketGroup + ">");
 			}
 		});
 	}
@@ -137,6 +137,9 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 		$scope.totalImportCost = 0;
 		$scope.totalExportCost = 0;
 		$scope.totalTaxCost = 0;
+		$scope.totalImportMarketFees = 0;
+		$scope.totalExportMarketFees = 0;
+		$scope.totalProfitPerHour = 0;
 	}
 	
 	$scope.updateMinRunHours = function(){
@@ -204,6 +207,36 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				}
 			}
 		})
+		$scope.totalImportMarketFees = $scope.totalImportCost 
+			* ($scope.localTaxes + $scope.brokerFees) / 100;
+		$scope.totalExportMarketFees = $scope.totalExportCost 
+			* ($scope.localTaxes + $scope.brokerFees) / 100;
+		$scope.totalProfitPerHour = $scope.totalExportCost
+									- $scope.totalExportMarketFees
+									- $scope.totalImportCost
+									- $scope.totalImportMarketFees
+									- $scope.totalTaxCost;
+		angular.forEach($scope.planets, function(p){
+//			console.log(p.text);
+			p.totalProfit = 0;
+			p.signed = 1;
+			p.marketFees = 0;
+			angular.forEach(p.importExport, function(item){
+//				console.log(item.typeID);
+				var itemCost = item.quantity * $scope.marketPrices[item.typeID].price;
+				p.totalProfit += itemCost;
+				var marketFees = itemCost * ($scope.brokerFees + $scope.localTaxes) / 100;
+				if(marketFees > 0){
+					p.marketFees += marketFees;
+				} else{
+					p.marketFees -= marketFees;
+				}
+			});
+			p.totalProfit -= (p.importTaxes + p.exportTaxes);
+			if(p.totalProfit < 0){
+				p.signed *= -1;
+			}
+		});
 	}
 	
 	function standardContains(collection, item){
@@ -289,6 +322,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 		this.totalStorage = 0;
 		this.runtime = 0;
 		this.resourceDatalist = [];
+		this.totalProfit = 0;
 		
 		this.updateCPU = function(){
 			this.CPU = 0;
@@ -391,7 +425,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				}
 			}
 			else{
-				console.log("Possible Error in runtime determination, please report to dev");
+				console.error("Possible Error in runtime determination, please report to dev");
 				this.runtime =  0;
 			}
 			$scope.updateMinRunHours();
@@ -409,7 +443,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				else if(io.quantity > 0){
 					this.exportTaxes += tax;
 				}
-				else { console.log("IO Error with quantity = 0 at " + io); }
+				else { console.debug("IO Debug with quantity = 0 at " + io); }
 			}, this)
 			$scope.updateTotalTaxCost();
 		}
@@ -452,7 +486,11 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				else if (vol > 0){
 					this.exportVolume += vol;
 				}
-				else{ console.log("IO Error with volume = 0 at " + io); }
+				else{
+//					$scope.removeElementFrom(io, this.importExport);
+					delete this.importExport[io];
+//					console.log("Removed element with volume 0: " + io.typeID); 
+				}
 			}, this);
 		}
 		
@@ -503,7 +541,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				}
 			}, this);
 			if(allowed.length == 0){
-				console.log("Allowed planets is empty for this planet");
+//				console.log("Allowed planets is empty for this planet");
 				//this should never be triggered if I did the above right
 			}
 			this.allowedPlanets = allowed;
@@ -538,11 +576,102 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 		this.addExtractor = function(){
 			this.extractors.push({resourceId:'', headcount:0});
 		}
+		this.removeStorage = function(){
+			this.storagefacilities -= 1;
+			if(this.storagefacilities < 0){
+				this.storagefacilities = 0;
+			}
+			this.updateCPU();
+			this.updateGrid(); 
+			this.updateStorage();
+			this.updateCost();
+		}
+		this.removeLaunchpad = function(){
+			this.launchpads -= 1;
+			if(this.launchpads < 0){
+				this.launchpads = 0;
+			}
+			this.updateCPU();
+			this.updateGrid(); 
+			this.updateStorage();
+			this.updateCost();
+		}
+		this.addStorage = function(){
+			if(this.storagefacilities < 0){
+				console.log("No permanent damage please");
+			}
+			this.storagefacilities += 1;
+			this.updateCPU();
+			this.updateGrid(); 
+			this.updateStorage();
+			this.updateCost();
+		}
+		this.addLaunchpad = function(){
+			if(this.launchpads < 0){
+				console.log("No permanent damage please");
+			}
+			this.launchpads += 1;
+			this.updateCPU();
+			this.updateGrid(); 
+			this.updateStorage();
+			this.updateCost();
+		}
 		
 		//initialization
 		this.updateAllowedPlanets();
 		
 	} //planet definition "function"
+	
+	
+	$scope.createPlanetFromCopy = function(planet, suffix){
+		var id = $scope.planets.length;
+		$scope.planets.push(new Planet(id));
+		
+		/*
+		 * $scope.planets.push(new Planet($scope.planets.length));
+//		console.log($scope.planets);
+		$scope.changeActivePlanet($scope.planets.length-1);
+		 * 
+		 */
+		
+		angular.forEach(planet.basics, function(f){
+			$scope.planets[id].basics.push({schematic:f.schematic, number:f.number, avgActiveCycles:f.avgActiveCycles});
+//			console.log(f.schematic);
+		});
+		angular.forEach(planet.advanced, function(f){
+			$scope.planets[id].advanced.push({schematic:f.schematic, number:f.number, avgActiveCycles:f.avgActiveCycles});
+//			console.log(f.schematic);
+		});
+		angular.forEach(planet.hightech, function(f){
+			$scope.planets[id].hightech.push({schematic:f.schematic, number:f.number, avgActiveCycles:f.avgActiveCycles});
+//			console.log(f.schematic);
+		});
+		angular.forEach(planet.extractors, function(e){
+			$scope.planets[id].extractors.push({resourceId: e.resourceId, headcount: e.headcount});
+		});
+		$scope.planets[id].storagefacilities = planet.storagefacilities;
+		$scope.planets[id].launchpads = planet.launchpads;
+		$scope.planets[id].useCCStorage = planet.useCCStorage;
+		$scope.planets[id].restrictPads = planet.restrictPads;
+		$scope.planets[id].taxRate = planet.taxRate;
+		$scope.planets[id].level = planet.level;
+		$scope.planets[id].AvgLinkLength = planet.AvgLinkLength;
+		$scope.planets[id].avgActiveCycles = planet.avgActiveCycles;
+		$scope.planets[id].isFactoryPlanet = planet.isFactoryPlanet;
+		$scope.planets[id].text = planet.text + suffix;
+		
+		$scope.planets[id].updateCPU();
+		$scope.planets[id].updateGrid();
+		$scope.planets[id].updateCost();
+		$scope.planets[id].updateStorage();
+		$scope.planets[id].updateImportExports();
+		$scope.planets[id].updateAllowedPlanets();
+		
+		$scope.changeActivePlanet(id);
+	}
+	
+	
+	
 	
 	$scope.$watch('planets.length', function(){
 		var height = document.getElementById("planetNavTabs").offsetHeight;
@@ -553,25 +682,26 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 	
 	$scope.marketPrices = [];
 
-	$scope.populatePriceMap = function(){
+	//function populatePriceMapFromStatic(){
+	$scope.populatePriceMapFromStatic = function(){
 		var types = [];
-		
+		$scope.updateTotalImportExport();
 		angular.forEach($scope.totalImportExport, function(ietype){
-			console.log("Pushing: " + ietype);
+//			console.log("Pushing: " + ietype);
 			types.push(ietype.typeID);
 		});
 		console.log("Intermediate, types = " + types);
 		if(types.length === 0){
-			console.log("Length of totalImportExport is 0, not making price call")
+//			console.log("Length of totalImportExport is 0, not making price call")
 		}
 		else{
-			console.log("Making price call with : " + types);
+//			console.log("Making price call with : " + types);
 			var getData = {method: 'GET',
-			url: '/priceAPI',
+			url: '/priceAPI/mock',
 			params: {
 				typeList: types
 			}};
-			
+			console.log("Making call: " + getData);
 			$http(getData)
 			.success(function(data){
 				$scope.marketPrices = data;
@@ -579,9 +709,203 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				$scope.updateTotalImportExportCost();
 			})
 			.error(function(data, status, headers, config){
-				console.log("Call failed with info: " + data + " " + status + " " 
+				console.error("populatePriceMapFromStatic failed with info: " + data + " " + status + " " 
 						+ headers + " " + config); 
 			});
 		}
 	}
+	
+	$scope.marketHubList = ({30000142:"Jita", 10000002:"The Forge"});
+	
+	$scope.calledRemoteSuccessfully = false;
+	$scope.importMarketSystem = 30000142;
+	$scope.exportMarketSystem = 30000142;
+	$scope.orderTypeList = ["buy", "sell"]; //ignoring all
+	$scope.marketStatTypeList = ["wavg", "avg", "median", "fivePercent", "max", "min"];
+
+	$scope.im_orderType = "buy";
+	$scope.im_marketStatType = "fivePercent";
+	$scope.im_brokerfees = 1;
+	$scope.im_salestax = 1.5;
+	
+	$scope.ex_orderType = "buy";
+	$scope.ex_marketStatType = "fivePercent";
+	$scope.ex_brokerfees = 1;
+	$scope.ex_salestax = 1.5;
+	
+	$scope.realMarketPrices = {};
+	
+	/*
+	 * In planets: 
+	 * 		planet profit before market fees
+	 * 		market fees
+	 * 
+	 * Total:
+	 * 		Total Export Revenue
+	 * 		Export Market Fees
+	 * 		Total Import Cost
+	 * 		Import Market Fees
+	 * 		Total hourly customs tax (already exist?)
+	 * 		profit per hour (optional)
+	 * 
+	 */
+	
+	$scope.updateMarketPricesByQualifiers = function(){
+		if(!$scope.calledRemoteSuccessfully){
+			console.error("Remote call failed, not refreshing market prices");
+			return;
+		}
+		//$scope.realMarketPrices
+		angular.forEach($scope.planets, function(p){
+			p.importCostValue = 0;
+			p.exportRevenueValue = 0;
+			//p.importMarketFees = 0;
+			//p.exportMarketFees = 0;
+			angular.forEach(p.importExport, function(io){
+//				console.log(io);
+				//marketHubList[exportMarketSystem]
+				if(io.quantity < 0){
+					var price = $scope.realMarketPrices[io.typeID][$scope.importMarketSystem][$scope.im_orderType][$scope.ex_marketStatType];
+					p.importCostValue += price * io.quantity * -1;
+				}
+				else if(io.quantity > 0){
+					var price = $scope.realMarketPrices[io.typeID][$scope.exportMarketSystem][$scope.ex_orderType][$scope.im_marketStatType];
+					p.exportRevenueValue += price * io.quantity;
+				}
+				else{
+					console.debug("Quantity = 0 in updateMarketPrices>planets: " + io.typeID);
+				}
+			});//foreach io
+			if($scope.im_orderType == "buy"){
+				p.importMarketFees = p.importCostValue * ($scope.im_brokerfees)/100;
+			} else{
+				p.importMarketFees = 0;
+			}
+			if($scope.ex_orderType == "buy"){
+				p.exportMarketFees = p.exportRevenueValue * ($scope.ex_brokerfees + $scope.ex_salestax)/100;
+			}
+			else{
+				p.exportMarketFees = p.exportRevenueValue * ($scope.ex_salestax)/100;
+			}
+		});//forEach planet
+		$scope.totalImportCost = 0;
+		$scope.totalExportRevenue = 0;
+			
+		angular.forEach($scope.totalImportExport, function(ietype){
+			//$scope.totalImportExport[io.typeID] = ({typeID:io.typeID,quantity:io.quantity,planets:p.planetID});
+			if(ietype.quantity < 0){
+				var price = $scope.realMarketPrices[ietype.typeID][$scope.importMarketSystem][$scope.im_orderType][$scope.im_marketStatType];
+				$scope.totalImportCost += (ietype.quantity * -1) * price;
+			}
+			else if(ietype.quantity > 0){
+				var price = $scope.realMarketPrices[ietype.typeID][$scope.exportMarketSystem][$scope.ex_orderType][$scope.ex_marketStatType];
+				$scope.totalExportRevenue += ietype.quantity * price;
+			}
+			else{
+				console.debug("Quantity = 0 in updateMarketPrices>global: " + ietype.typeID);
+			}
+		});
+		if($scope.ex_orderType == "buy"){
+			$scope.exportMarketFees = $scope.totalExportRevenue * ($scope.ex_brokerfees + $scope.ex_salestax)/100;
+		}
+		else{
+			$scope.exportMarketFees = $scope.totalExportRevenue * ($scope.ex_salestax)/100;
+		}
+		if($scope.im_orderType == "buy"){
+			$scope.importMarketFees = $scope.totalImportCost * ($scope.im_brokerfees)/100;
+		}
+		else{
+			$scope.importMarketFees = 0;
+		}
+		$scope.totalProfitPerHour = $scope.totalExportRevenue 
+			- ($scope.exportMarketFees + $scope.totalImportCost + $scope.importMarketFees + $scope.totalTaxCost);
+	}
+
+	/*$scope.updateMarketPricesByQualifiers = function(){
+		if(!$scope.calledRemoteSuccessfully){
+			console.log("updateMarketPricesByQualifiers: Remote api call failed, qualifiers are meaningless");
+			return;
+		}
+		$scope.marketPrices = [];
+		//$scope.planets[id].hightech.push({schematic:f.schematic, number:f.number, avgActiveCycles:f.avgActiveCycles});
+		angular.forEach($scope.realMarketPrices, function(item){
+			console.log(item);
+			angular.forEach(item, function(sub1){
+				console.log(sub1);
+			})
+			var idvar = item.query.types[0];
+			var quantityvar = item[$scope.marketAction].volume;
+			var pricevar = item[$scope.marketAction][$scope.marketDataType];
+			console.log("updateMarketPricesByQualifiers: " + idvar + ", " + quantityvar + ", " + pricevar)
+			var ioMarketDetails = {id:idvar, quantity:quantityvar, price:pricevar};
+			$scope.marketPrices.push({idvar:ioMarketDetails});
+		})
+		console.log($scope.marketPrices);
+	}*/
+	
+	
+	//test the real one
+	$scope.populatePriceMap = function(){
+//		console.log("Import System " + $scope.importMarketSystem + ": " + $scope.marketHubList[$scope.importMarketSystem]);
+//		console.log("Export System " + $scope.exportMarketSystem + ": " + $scope.marketHubList[$scope.exportMarketSystem]);
+		
+		$scope.calledRemoteSuccessfully = false;
+		var types = [];
+		$scope.updateTotalImportExport();
+		angular.forEach($scope.totalImportExport, function(ietype){
+			if(!($scope.realMarketPrices[ietype.typeID] && $scope.realMarketPrices[ietype.typeID][$scope.importMarketSystem]) 
+				|| !($scope.realMarketPrices[ietype.typeID] && $scope.realMarketPrices[ietype.typeID][$scope.exportMarketSystem])){
+				types.push(ietype.typeID);
+			}
+		});
+		var systems = [];
+		if($scope.importMarketSystem == $scope.exportMarketSystem){
+			systems = [$scope.importMarketSystem];
+		}
+		else{
+			systems = [$scope.importMarketSystem, $scope.exportMarketSystem];
+		}
+//		console.log("IO Systems: " + $scope.importMarketSystem + ", " + $scope.exportMarketSystem);
+//		console.log("Systems: " + systems);
+//		console.log("Intermediate, types = " + types);
+		if(types.length === 0){
+			console.debug("Length of totalImportExport is 0, not making price call")
+		}
+		else{
+//			console.log("Making price call with : " + types);
+			var getData = {method: 'GET',
+					url: '/priceAPI',
+					params: {
+						type: types,
+						system: systems
+					}
+			};
+//			console.log("Making call: " + getData);
+			$http(getData)
+			.success(function(data){
+				var notEmpty = false;
+				for(var d in data){
+					notEmpty = true;
+					break;
+				}
+				if(notEmpty){
+					console.debug("populatePriceMap: data found");
+					$scope.calledRemoteSuccessfully = true;
+					$scope.realMarketPrices = data;
+					$scope.updateMarketPricesByQualifiers();
+				}
+				else{
+					console.error("populatePriceMap: call failed");
+//					$scope.populatePriceMapFromStatic();
+				}
+//				console.log("Call successful with response: " + data);
+//				$scope.updateTotalImportExportCost();
+			})
+			.error(function(data, status, headers, config){
+				console.log("populatePriceMap failed with info: " + data + " " + status + " " 
+						+ headers + " " + config); 
+			});
+		}
+	}
+	
 });
