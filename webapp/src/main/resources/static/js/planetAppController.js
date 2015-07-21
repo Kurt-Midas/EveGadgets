@@ -339,7 +339,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				numFacilities += this.advanced[i].number;
 			}
 			for(var i = 0; i < this.hightech.length; i++){
-				this.CPU += this.hightech[i].number * $scope.buildings.Basic_Industry.CPU;
+				this.CPU += this.hightech[i].number * $scope.buildings.High_Tech_Industry.CPU;
 				numFacilities += this.hightech[i].number;
 			}
 			for(var i = 0; i < this.extractors.length; i++){
@@ -366,7 +366,7 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 				numFacilities += this.advanced[i].number;
 			}
 			for(var i = 0; i < this.hightech.length; i++){
-				this.Powergrid += this.hightech[i].number * $scope.buildings.Basic_Industry.Power;
+				this.Powergrid += this.hightech[i].number * $scope.buildings.High_Tech_Industry.Power;
 				numFacilities += this.hightech[i].number;
 			}
 			for(var i = 0; i < this.extractors.length; i++){
@@ -619,6 +619,81 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 		
 		//initialization
 		this.updateAllowedPlanets();
+		
+		this.addPrerequisiteProduction = function(f){
+			//f is a factory
+			console.log("adding prereqs for " + f);
+			var schID = getIDfromName(f.schematic);
+			if(schID != undefined){
+				var sch = $scope.data.schematicMap[schID];
+				angular.forEach(sch.recipe, function(m){
+					console.log(m.typeId);
+					var fTier = $scope.data.itemDetails[m.typeId].tier;
+					var name = $scope.data.itemDetails[m.typeId].name;
+					if(m.typeId != schID){
+						console.log("not undefined: " + name + ", " + fTier);
+						if(fTier == 1){
+							console.log("adding basic");
+							this.basics.push({schematic:name, number:0, avgActiveCycles:1});
+						}
+						else if(fTier == 2 || fTier == 3){
+							console.log("adding advanced");
+							this.advanced.push({schematic:name, number:0, avgActiveCycles:1});
+						}
+						else if(fTier == 4){
+							console.log("adding hightech");
+							this.hightech.push({schematic:name, number:0, avgActiveCycles:1});
+						} //this is probably a bad implementation. Figure out if it's in the datalist, that avoids issues.
+						else if(fTier == 0){
+//							this.resourceDatalist
+							if(standardContains(this.resourceDatalist, name)){
+								console.log("adding extractor: " + m.typeId);
+								this.extractors.push({resourceId:name, headcount:0});
+								this.updateImportExports();
+								this.updateCPU();
+								this.updateGrid();
+								this.updateCost();
+								this.updateAllowedPlanets();
+							}else{
+								console.log("Cannot add extractor: planet resource combination does not exist");
+							}
+							
+							
+//							$scope.planets[id].extractors.push({resourceId: e.resourceId, headcount: e.headcount});
+						}
+						else{
+							console.debug("YOU FUCKED UP BOY");
+						}
+					}
+				}, this);
+			}
+			
+		}
+		
+		/*
+		 * //private
+		this.ImportExportUtil = function(f){
+			var schID = getIDfromName(f.schematic);
+			if(schID != undefined){
+				var sch = $scope.data.schematicMap[schID];
+				if(this.importExport[sch.outputID] == undefined){
+					this.importExport[sch.outputID] = ({typeID:sch.outputID,quantity:0});
+				}
+				this.importExport[sch.outputID].quantity += sch.outputQuantity 
+					* f.number * 3600 / (sch.cycleTime * this.avgActiveCycles * f.avgActiveCycles);
+				angular.forEach(sch.recipe, function(m){
+					if(this.importExport[m.typeId] == undefined){
+						this.importExport[m.typeId] 
+							= ({typeID:m.typeId,quantity:0});
+					}
+					if(m.typeId != sch.outputID){
+						this.importExport[m.typeId].quantity -= m.quantity * f.number 
+							/ (this.avgActiveCycles * f.avgActiveCycles);
+					}
+				}, this)
+			}
+		}
+		 */
 		
 	} //planet definition "function"
 	

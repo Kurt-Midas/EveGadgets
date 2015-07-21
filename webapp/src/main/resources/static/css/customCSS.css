@@ -70,7 +70,7 @@ body {
 	margin-left:10px;
 	display:inline; 
 	line-height:1;
-	margin-left: 50px;
+	margin-left: 63px;
 }
 .addPlanetButton{
 	white-space:normal; 
@@ -220,6 +220,9 @@ input[type=number]::-webkit-outer-spin-button {
 	padding: 0;
 	padding-left: 7.5%;
 	border-color: transparent;
+}
+.btn-duplicate{
+	margin-left: 31px !important;
 }
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 

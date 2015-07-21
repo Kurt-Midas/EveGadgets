@@ -1,0 +1,69 @@
+<div class="input-group input-group-sm">
+	<!-- Delete Factory Button -->
+	<span class="input-group-btn">
+		<button class="btn btn-danger" ng-click=
+			"removeThis();
+			p.updateCPU();
+			p.updateGrid();
+			p.updateCost();
+			p.updateImportExports();
+			p.updateAllowedPlanets()">
+			<span class="glyphicon glyphicon-remove"></span>
+		</button>
+	</span>
+	
+	<!-- Select Datalist -->
+	<select class="input form-control" style="width:auto"
+		ng-model="factory.schematic"
+		ng-options="o as o for o in typeList | orderBy"
+		ng-change="p.updateImportExports()"></select>
+
+	<!-- Number Buttons -->
+	<span class="input-group input-group-sm">
+	  <span class="input-group-btn">
+		  <button type="button" class="btn btn-default btn-number" ng-if="factory.number>0" ng-click="
+			factory.number = factory.number-1;
+			p.updateCPU();
+			p.updateCost();
+			p.updateGrid();
+			p.updateImportExports()
+			">
+			  <span class="glyphicon glyphicon-minus"></span>
+		  </button>
+		  <button type="button" class="btn btn-disabled btn-number" ng-if="!factory.number>0">
+			  <span class="glyphicon glyphicon-minus"></span>
+		  </button>
+	  </span>
+	  <input type="number" ng-model="factory.number" class="form-control input-number pull-left" 
+		style="width:50px" maxlength="2" ng-blur="
+			p.updateCPU();
+			p.updateCost();
+			p.updateGrid();
+			p.updateImportExports()"> 
+		<!-- min="1" max="10" style="width:30px" maxlength=2> -->
+	  <span class="input-group-btn pull-left">
+		  <button type="button" class="btn btn-default btn-number pull-left"
+			 ng-click="factory.number = factory.number + 1;
+			 p.updateCPU();
+			p.updateGrid();
+			p.updateCost();
+			p.updateImportExports()">
+			  <span class="glyphicon glyphicon-plus"></span>
+		  </button>
+	  </span>
+	  <!-- addPrerequisiteProduction -->
+	  <span class="input-group-btn pull-left">
+		  <button type="button" class="btn btn-success btn-duplicate pull-left"
+			ng-click="p.addPrerequisiteProduction(factory)">
+				<i class="fa fa-link"></i>
+		  </button>
+	  </span>
+	  
+	  <span ng-if="p.isFactoryPlanet">
+			<input type="number" ng-model=factory.avgActiveCycles 
+			class="form-control input-number input-sm utilizationField"
+			ng-blur="p.updateImportExports()">
+	  </span>
+	
+	</span><!-- Number input -->
+</div><!-- Input Group repeat -->

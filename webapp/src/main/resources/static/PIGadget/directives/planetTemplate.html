@@ -175,136 +175,28 @@
 			<div class="row">
 				<h4 >Add Basic Factory
 				<button class="btn btn-primary btn-sm" ng-click="
-				p.addBasic(); p.updateCPU(); p.updateGrid(); p.updateCost()
-				" >Basic</button>
-				</h4>  
-				<div class="input-group input-group-sm" ng-repeat="f in p.basics">
-				
-					<!-- Delete Factory Button -->
-					<span class="input-group-btn">
-						<button class="btn btn-danger" ng-click=
-							"removeElementFrom(f, p.basics);
-							p.updateCPU();
-							p.updateGrid();
-							p.updateCost();
-							p.updateImportExports()">
-							<span class="glyphicon glyphicon-remove"></span>
-						</button>
-					</span>
-					
-					<!-- Select Datalist -->
-					<select class="input form-control" style="width:auto"
-						ng-model="f.schematic"
-						ng-options="o as o for o in basicTypeList | orderBy"
-						ng-change="p.updateImportExports()"></select>
-			
-					<!-- Number Buttons -->
-					<span class="input-group input-group-sm">
-					  <span class="input-group-btn">
-						  <button type="button" class="btn btn-default btn-number" ng-if="f.number>0" ng-click="
-							f.number = f.number-1;
-							p.updateCPU();
-							p.updateCost();
-							p.updateGrid();
-							p.updateImportExports()
-							">
-							  <span class="glyphicon glyphicon-minus"></span>
-						  </button>
-						  <button type="button" class="btn btn-disabled btn-number" ng-if="!f.number>0">
-							  <span class="glyphicon glyphicon-minus"></span>
-						  </button>
-					  </span>
-					  <input type="number" ng-model="f.number" class="form-control input-number pull-left" 
-						style="width:50px" maxlength="2" ng-blur="
-							p.updateCPU();
-							p.updateCost();
-							p.updateGrid();
-							p.updateImportExports()"> 
-						<!-- min="1" max="10" style="width:30px" maxlength=2> -->
-					  <span class="input-group-btn pull-left">
-						  <button type="button" class="btn btn-default btn-number pull-left"
-							 ng-click="f.number = f.number + 1;
-							 p.updateCPU();
-							p.updateGrid();
-							p.updateCost();
-							p.updateImportExports()">
-							  <span class="glyphicon glyphicon-plus"></span>
-						  </button>
-					  </span>
-					  
-					  <span ng-if="p.isFactoryPlanet">
-							<input type="number" ng-model=f.avgActiveCycles 
-							class="form-control input-number input-sm utilizationField"
-							ng-blur="p.updateImportExports()">
-					  </span>
-					
-					</span><!-- Number input -->
-				</div><!-- Input Group repeat -->
+				p.addBasic(); p.updateCPU(); p.updateGrid(); p.updateCost()">
+					Basic
+				</button>
+				</h4>
+				<div ng-repeat="f in p.basics">
+					<eg-factory-manager factory="f" factory-list="p.basics" p="p" type-list="basicTypeList"
+						delete-this-factory="removeElementFrom(e,c)">
+					</eg-factory-manager>
+				</div>
 			</div>
-			
+
 			<div class="row">
 				<h4 >Add Advanced Factory
 				<button class="btn btn-primary btn-sm" ng-click="
-				p.addAdvanced(); p.updateCPU(); p.updateGrid(); p.updateCost()
-				" >Advanced</button>
-				</h4>  
-				<div class="input-group input-group-sm" ng-repeat="f in p.advanced">
-				
-					<span class="input-group-btn">
-						<button class="btn btn-danger" ng-click=
-							"removeElementFrom(f, p.advanced);
-							p.updateCPU();
-							p.updateGrid();
-							p.updateCost();
-							p.updateImportExports()">
-							<span class="glyphicon glyphicon-remove"></span>
-						</button>
-					</span>
-					<select class="input form-control" style="width:auto"
-						ng-model="f.schematic"
-						ng-options="o as o for o in advancedTypeList | orderBy"
-						ng-change="p.updateImportExports()"></select>
-			
-				  <span class="input-group input-group-sm">
-					  <span class="input-group-btn">
-						  <button type="button" class="btn btn-default btn-number" ng-if="f.number>0" ng-click="
-							f.number = f.number-1;
-							p.updateCPU();
-							p.updateCost();
-							p.updateGrid();
-							p.updateImportExports()
-							">
-							  <span class="glyphicon glyphicon-minus"></span>
-						  </button>
-						  <button type="button" class="btn btn-disabled btn-number" ng-if="!f.number>0">
-							  <span class="glyphicon glyphicon-minus"></span>
-						  </button>
-					  </span>
-					  <input type="number" ng-model="f.number" class="form-control input-number pull-left" 
-						style="width:50px" maxlength="2" ng-blur="
-							p.updateCPU();
-							p.updateCost();
-							p.updateGrid();
-							p.updateImportExports()"> 
-						<!-- min="1" max="10" style="width:30px" maxlength=2> -->
-					  <span class="input-group-btn pull-left">
-						  <button type="button" class="btn btn-default btn-number pull-left"
-							 ng-click="f.number = f.number + 1;
-							 p.updateCPU();
-							p.updateGrid();
-							p.updateCost();
-							p.updateImportExports()">
-							  <span class="glyphicon glyphicon-plus"></span>
-						  </button>
-					  </span>
-					  
-					  <span ng-if="p.isFactoryPlanet">
-							<input type="number" ng-model=f.avgActiveCycles 
-							class="form-control input-number input-sm utilizationField"
-							ng-blur="p.updateImportExports()">
-					  </span>
-					</span>
-					
+				p.addAdvanced(); p.updateCPU(); p.updateGrid(); p.updateCost()">
+					High Tech
+				</button>
+				</h4>
+				<div ng-repeat="f in p.advanced">
+					<eg-factory-manager factory="f" factory-list="p.advanced" p="p" type-list="advancedTypeList"
+						delete-this-factory="removeElementFrom(e,c)">
+					</eg-factory-manager>
 				</div>
 			</div>
 			
@@ -314,71 +206,18 @@
 				p.updateGrid(); p.updateCost(); p.updateAllowedPlanets()">
 					High Tech
 				</button>
-				</h4>  
-				<div class="input-group input-group-sm" ng-repeat="f in p.hightech">
-				
-					<span class="input-group-btn">
-						<button class="btn btn-danger" ng-click=
-							"removeElementFrom(f, p.hightech);
-							p.updateCPU();
-							p.updateGrid();
-							p.updateCost();
-							p.updateImportExports();
-							p.updateAllowedPlanets()">
-							<span class="glyphicon glyphicon-remove"></span>
-						</button>
-					</span>
-					<select class="input form-control" style="width:auto"
-						ng-model="f.schematic"
-						ng-options="o as o for o in hightechTypeList | orderBy"
-						ng-change="p.updateImportExports()"></select>
-					
-					<span class="input-group input-group-sm">
-					  <span class="input-group-btn">
-						  <button type="button" class="btn btn-default btn-number" ng-if="f.number>0" ng-click="
-							f.number = f.number-1;
-							p.updateCPU();
-							p.updateCost();
-							p.updateGrid();
-							p.updateImportExports()
-							">
-							  <span class="glyphicon glyphicon-minus"></span>
-						  </button>
-						  <button type="button" class="btn btn-disabled btn-number" ng-if="!f.number>0">
-							  <span class="glyphicon glyphicon-minus"></span>
-						  </button>
-					  </span>
-					  <input type="number" ng-model="f.number" class="form-control input-number pull-left" 
-						style="width:50px" maxlength="2" ng-blur="
-							p.updateCPU();
-							p.updateCost();
-							p.updateGrid();
-							p.updateImportExports()"> 
-						<!-- min="1" max="10" style="width:30px" maxlength=2> -->
-					  <span class="input-group-btn pull-left">
-						  <button type="button" class="btn btn-default btn-number pull-left"
-							 ng-click="f.number = f.number + 1;
-							 p.updateCPU();
-							p.updateGrid();
-							p.updateCost();
-							p.updateImportExports()">
-							  <span class="glyphicon glyphicon-plus"></span>
-						  </button>
-					  </span>
-				  
-					  <span ng-if="p.isFactoryPlanet">
-							<input type="number" ng-model=f.avgActiveCycles 
-							class="form-control input-number input-sm utilizationField"
-							ng-blur="p.updateImportExports()">
-					  </span>
-				  </span>	
-				</div>
+				</h4> 
+				<div ng-repeat="f in p.hightech">
+					<eg-factory-manager factory="f" factory-list="p.hightech" p="p" type-list="hightechTypeList"
+						delete-this-factory="removeElementFrom(e,c)">
+					</eg-factory-manager>
+				</div> 
 			</div>
 			
 			<div class="row">
 				<h4 >
 				Extractors:  
-				<button class="btn btn-primary btn-sm" ng-click="p.addExtractor(); p.updateCPU(); p.updateGrid()">
+				<button class="btn btn-primary btn-sm" ng-click="p.addExtractor(); p.updateCPU(); p.updateGrid(); p.updateCost();">
 					Extractor
 				</button>
 				</h4>
