@@ -1,4 +1,4 @@
-package com.evegadgets.gadgets.webapp.controllers;
+package com.evegadgets.gadgets.planetary.controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,8 +1,7 @@
-package com.evegadgets.gadgets.webapp.controllers;
+package org.priceutils.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.priceutils.calls.EveCentralHandler;
 import org.springframework.ui.ModelMap;
@@ -10,14 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.evegadgets.gadgets.planetary.pricing.MockPriceUtil;
-import com.evegadgets.gadgets.planetary.pricing.PriceMap;
-
 @RestController
 @RequestMapping("/priceAPI")
 public class PriceAPIController {
 	
-	@RequestMapping("/mock")
+	/*@RequestMapping("/mock")
 	public Map<Integer, PriceMap> getMockPriceMap(
 			@RequestParam(value="typeList") String[] types){
 		System.out.println("DEBUG: in getPriceMap with arg: <" + types + ">");
@@ -31,6 +27,11 @@ public class PriceAPIController {
 			}
 		}
 		return MockPriceUtil.getPriceMap(typeList, 0);
+	}*/
+	
+	@RequestMapping("/test")
+	public String testEndpoint(){
+		return "priceAPI endpoint works";
 	}
 
 	@RequestMapping("")

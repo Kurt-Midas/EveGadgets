@@ -1,0 +1,39 @@
+<div>
+
+	<button type="button" class="btn btn-default btn-lg" ng-click="open()">
+		Save Setup
+	</button>
+	
+<!-- 	<div ng-switch on="display.view">
+		<div ng-switch-when="promptButtons"> -->
+			<script type="text/ng-template" id="saveSetupModal.html">
+			<div class="modal-header">
+					<h1>How do you want to save?</h1>
+				</div> <!-- modal-header -->
+				<div class="modal-body">
+					<span class="col-md-6 col-sm-12">
+						<button class="btn btn-success btn-lg btn-block" style="text-align: left"
+						ng-click="getText()">
+							<h3>Save as text block</h3>
+							<ul>
+								<li>Use "Recover Setup" to rebuild setup</li>
+								<li>Never expires</li>
+							</ul>
+						</button>
+					</span>
+					<span class="col-md-6 col-sm-12">
+						<button class="btn btn-success btn-lg btn-block" style="text-align: left"
+						ng-click="getUrl()">
+							<h3>Save as URL</h3>
+							<ul>
+								<li>Anyone with the link has the setup</li>
+								<li>Expires after 30 days</li>
+							</ul>
+						</button>
+					</span>
+				</div>
+				<div class="modal-footer">
+					Footer!
+				</div>
+			</script>
+</div>

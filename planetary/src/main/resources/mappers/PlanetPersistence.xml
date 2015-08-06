@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="PlanetPersistence">
+ 
+    <resultMap id="setupMap" type="PersistPlanetDomain" autoMapping="true">
+    	<id property="hashKey" column="hashKey"/>
+    	<id property="lastRefreshDate" column="lastRefreshDate"/>
+    	<id property="setup" column="setup"/>
+    	<id property="version" column="version"/>
+    </resultMap>
+    
+    <select id="getPlanet" resultMap="setupMap" parameterType="int">
+    	SELECT
+    		hashKey,
+    		setup,
+    		lastRefreshDate,
+    		version
+    	FROM planetSetupStorage
+    	WHERE hashKey = #{hashKey};
+    </select>
+    
+    <update id="refreshCreatedDate" parameterType="int">
+    	UPDATE planetSetupStorage
+    	SET lastRefreshDate = CURDATE() <!-- Looks like CURDATE() is MySql-specific. Bad? -->
+    	WHERE hashKey = #{hashKey};
+    </update>
+    
+    <insert id="savePlanet" parameterType="PersistPlanetDomain">
+    	INSERT INTO planetSetupStorage (hashKey, setup, lastRefreshDate, version)
+    	<!-- OUTPUT INSERTED.hashKey -->
+    	VALUES (#{hashKey}, #{setup}, CURDATE(), 1);
+    </insert>
+</mapper>
+
+
+<!--
+private static int savePlanet(PersistPlanetDomain planetSetup){
+		return session.insert("PlanetPersistence.savePlanet", planetSetup);
+	}
+	
+	private static PersistPlanetDomain getSetupFromKey(int hashKey){
+		return session.selectOne("PlanetPersistence.getPlanet", hashKey);
+	}
+	
+	private static int refreshCreatedDate(int hashKey){
+		return session.update("PlanetPersistence.refreshCreatedDate", hashKey);
+	}
+-->

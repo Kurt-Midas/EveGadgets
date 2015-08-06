@@ -26,6 +26,8 @@
         	type="com.evegadgets.gadgets.planetary.structure.namemap.NameMapDomain"/>
         <typeAlias alias="ItemDetailsDomain" 
         	type="com.evegadgets.gadgets.planetary.structure.itemdetails.ItemDetailsDomain"/>
+        <typeAlias alias="PersistPlanetDomain"
+        	type="com.evegadgets.gadgets.planetary.persist.PersistPlanetDomain"/>
     </typeAliases>
     
 	<environments default="development">
@@ -48,6 +50,7 @@
        <mapper resource="mappers/Schematics.xml"/>
        <mapper resource="mappers/NameMap.xml"/>
        <mapper resource="mappers/ItemDetails.xml"/>
+       <mapper resource="mappers/PlanetPersistence.xml"/>
     </mappers> 
 
 </configuration>

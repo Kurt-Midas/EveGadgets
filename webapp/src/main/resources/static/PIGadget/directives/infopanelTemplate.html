@@ -413,4 +413,16 @@
 			<div ng-hide="p.launchpads" class="errorText">Planet has no launchpads!</div>
 		</div>
 	</div>
+	
+	<!-- <div class="col-xs-6 infopanel">
+		<h1>JSON <small>ugly, I know</small></h1>
+		<button class="btn btn-warning" ng-click="generateSavePlanetJson()">Generate</button>
+		<textarea ng-model="savePlanetJson"></textarea>
+		{{savePlanetJson}}
+		<button class="btn btn-danger" ng-click="populateSetupFromJson(savePlanetJson)">Repopulate</button>
+	</div> -->
+	
+	<eg-save-setup-modal generate-save-setup-json="generateSavePlanetJson()"></eg-save-setup-modal>
+	<eg-load-setup-modal populate-setup-from-json="populateSetupFromJson(recoveryString)"></eg-load-setup-modal>
+	
 </div>

@@ -6,7 +6,16 @@ app.config(function($routeProvider, $httpProvider) {
 	$routeProvider.
 		when('/', {
 			templateUrl: 'PIGadget/PIApp.html',
-			controller: 'planetAppController'
+			controller: 'planetAppController',
+		}).
+		when('/:planetKey', {
+			templateUrl: 'PIGadget/PIApp.html',
+			controller: 'planetAppController',
+			/*
+			working with resolve and $q is a good idea eventually
+			but not before I get a setup method
+			with a defined resolution order 
+			*/
 		}).
 //		when('/FAQ', {
 //			templateUrl: 'PIFaq.html',
@@ -36,7 +45,7 @@ app.directive('variableHeight', function(){
 app.controller('ContactCtrl', function(){
 });
 
-app.controller('planetAppController', function($scope, $http, $rootScope){
+app.controller('planetAppController', function($scope, $http, $rootScope, $routeParams){
 
 	$scope.planets = [];
 
@@ -97,6 +106,12 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 //		console.log($scope.data.schematicMap)
 //		console.log($scope.data);
 		populateDatalists();
+		if($routeParams.planetKey){
+			console.log("params.planetKey identified: " + $routeParams.planetKey);
+			var setup = planetApi.getPlanet($routeParams.planetKey);
+			console.log("got setup string: " + setup);
+			$scope.populateSetupFromJson(setup);
+		}
 	});
 	
 	$scope.basicTypeList = [];
@@ -981,6 +996,206 @@ app.controller('planetAppController', function($scope, $http, $rootScope){
 						+ headers + " " + config); 
 			});
 		}
+	}
+	
+	/*
+	 * $scope.importMarketSystem = 30000142;
+	$scope.exportMarketSystem = 30000142;
+	$scope.orderTypeList = ["buy", "sell"]; //ignoring all
+	$scope.marketStatTypeList = ["wavg", "avg", "median", "fivePercent", "max", "min"];
+
+	$scope.im_orderType = "buy";
+	$scope.im_marketStatType = "fivePercent";
+	$scope.im_brokerfees = 1;
+	$scope.im_salestax = 1.5;
+	
+	$scope.ex_orderType = "buy";
+	$scope.ex_marketStatType = "fivePercent";
+	$scope.ex_brokerfees = 1;
+	$scope.ex_salestax = 1.5;
+	 */
+	
+	$scope.savePlanetJson = '';
+	$scope.generateSavePlanetJson = function(){
+		console.log("Inside generateSavePlanetJson");
+		var json = {};
+		//i, e + s, o, m, b, t
+		if($scope.importMarketSystem != 30000142){json.is = $scope.importMarketSystem;}
+		if($scope.exportMarketSystem != 30000142){json.es = $scope.exportMarketSystem;}
+		if($scope.im_orderType != "buy"){json.io = $scope.im_orderType;}
+		if($scope.ex_orderType != "buy"){json.eo = $scope.ex_orderType;}
+		if($scope.im_marketStatType != "fivePercent"){json.im = $scope.im_marketStatType;}
+		if($scope.ex_marketStatType != "fivePercent"){json.ex = $scope.ex_marketStatType;}
+		if($scope.im_brokerfees != 1){json.ib = $scope.im_brokerfees;}
+		if($scope.ex_brokerfees != 1){json.eb = $scope.ex_brokerfees;}
+		if($scope.im_salestax != 1.5){json.it = $scope.im_salestax;}
+		if($scope.ex_salestax != 1.5){json.et = $scope.ex_salestax;}
+		
+		json.pl = [];
+		//add info panel stuff
+		
+		for(var i = 0; i < $scope.planets.length; i++){
+			var p = {};
+			if($scope.planets[i].basics.length){
+				p.b = [];
+				angular.forEach($scope.planets[i].basics, function(f){
+					var factory = {};
+					if(f.schematic != "") {factory.s = getIDfromName(f.schematic);}
+					if(f.number != 1){factory.n = f.number;}
+					if(f.avgActiveCycles != 1) {factory.a = f.avgActiveCycles;}
+					p.b.push(factory);
+				});
+			}
+			if($scope.planets[i].advanced.length){
+				p.a = [];
+				angular.forEach($scope.planets[i].advanced, function(f){
+					var factory = {};
+					if(f.schematic != "") {factory.s = getIDfromName(f.schematic);}
+					if(f.number != 1){factory.n = f.number;}
+					if(f.avgActiveCycles != 1) {factory.a = f.avgActiveCycles;}
+					p.a.push(factory);
+				});
+			}
+			if($scope.planets[i].hightech.length){
+				p.h = [];
+				angular.forEach($scope.planets[i].hightech, function(f){
+					var factory = {};
+					if(f.schematic != "") {factory.s = getIDfromName(f.schematic);}
+					if(f.number != 1){factory.n = f.number;}
+					if(f.avgActiveCycles != 1) {factory.a = f.avgActiveCycles;}
+					p.h.push(factory);
+				});
+			}
+			if($scope.planets[i].extractors.length){
+				p.e = [];
+				angular.forEach($scope.planets[i].extractors, function(ex){
+					var extractor = {};
+					if(ex.resourceId != "") {extractor.r = $scope.data.nameMap[ex.resourceId];}
+					if(ex.headcount != 0) {extractor.h = ex.headcount;}
+					p.e.push(extractor);
+				});
+			}
+			if($scope.planets[i].storagefacilities != 0)
+				{p.s = $scope.planets[i].storagefacilities;}
+			if($scope.planets[i].launchpads != 0)
+				{p.p = $scope.planets[i].launchpads;}
+			if($scope.planets[i].useCCStorage)
+				{p.c = $scope.planets[i].useCCStorage;}
+			if($scope.planets[i].restrictPads)
+				{p.r = $scope.planets[i].restrictPads;}
+			if($scope.planets[i].taxRate != 10)
+				{p.t = $scope.planets[i].taxRate;}
+			if($scope.planets[i].level != 0)
+				{p.l = $scope.planets[i].level;}
+			if($scope.planets[i].AvgLinkLength != 200)
+				{p.n = $scope.planets[i].AvgLinkLength;}
+			if($scope.planets[i].avgActiveCycles != 1)
+				{p.v = $scope.planets[i].avgActiveCycles;}
+			if($scope.planets[i].isFactoryPlanet)
+				{p.f = $scope.planets[i].isFactoryPlanet;}
+			p.x = $scope.planets[i].text;
+			
+			json.pl.push(p);
+		}
+		console.log("Generated save json: " + json);
+//		$scope.savePlanetJson = angular.toJson(json);
+		return json;
+	}
+	
+	
+	$scope.populateSetupFromJson = function(stringVersion){
+		var json = angular.fromJson(stringVersion);
+		console.log("trying to populate setup");
+		console.log("string version: " + stringVersion);
+		console.log("json version: " + json);
+		if(json.is){$scope.importMarketSystem = json.is;} else {$scope.importMarketSystem = 30000142;}
+		if(json.es){$scope.exportMarketSystem = json.es;} else {$scope.exportMarketSystem = 30000142;}
+		if(json.io){$scope.im_orderType = json.io;} else {$scope.im_orderType = "buy";}
+		if(json.eo){$scope.ex_orderType = json.eo;} else {$scope.ex_orderType = "buy";}
+		if(json.im){$scope.im_marketStatType = json.im;} else {$scope.im_marketStatType = "fivePercent";}
+		if(json.em){$scope.ex_marketStatType = json.em;} else {$scope.ex_marketStatType = "fivePercent";}
+		if(json.ib){$scope.im_brokerfees = json.ib;} else {$scope.im_brokerfees = 1;}
+		if(json.eb){$scope.ex_brokerfees = json.eb;} else {$scope.ex_brokerfees = 1;}
+		if(json.it){$scope.im_salestax = json.it;} else {$scope.im_salestax = 1.5;}
+		if(json.et){$scope.ex_salestax = json.et;} else {$scope.ex_salestax = 1.5;}
+		
+		var planets = [];
+		angular.forEach(json.pl, function(p){
+			var planet = new Planet(planets.length);
+			angular.forEach(p.b, function(f){
+				var factory ={schematic:"", number:1, avgActiveCycles:1};
+				if(f.s){
+					factory.schematic = $scope.data.itemDetails[f.s].name;
+				}
+				if(f.n){
+					factory.number = f.n;
+				}
+				if(f.a){
+					factory.avgActiveCycles = f.a;
+				}
+				planet.basics.push(factory);
+			});
+			angular.forEach(p.a, function(f){
+				var factory ={schematic:"", number:1, avgActiveCycles:1};
+				if(f.s){
+					factory.schematic = $scope.data.itemDetails[f.s].name;
+				}
+				if(f.n){
+					factory.number = f.n;
+				}
+				if(f.a){
+					factory.avgActiveCycles = f.a;
+				}
+				planet.advanced.push(factory);
+			});
+			angular.forEach(p.h, function(f){
+				var factory ={schematic:"", number:1, avgActiveCycles:1};
+				if(f.s){
+					factory.schematic = $scope.data.itemDetails[f.s].name;
+				}
+				if(f.n){
+					factory.number = f.n;
+				}
+				if(f.a){
+					factory.avgActiveCycles = f.a;
+				}
+				planet.hightech.push(factory);
+			});
+			angular.forEach(p.e, function(e){
+				var extractor = {resourceId:'', headcount:0};
+				if(e.r){
+					extractor.resourceId = $scope.data.itemDetails[e.r].name;
+				}
+				if(e.h){
+					extractor.headcount = e.h;
+				}
+				planet.extractors.push(extractor);
+			});
+			if(p.s){planet.storagefacilities = p.s};
+			if(p.p){planet.launchpads = p.p};
+			if(p.c){planet.useCCStorage = p.c};
+			if(p.r){planet.restrictPads = p.r};
+			if(p.t){planet.taxRate = p.t};
+			if(p.l){planet.level = p.l};
+			if(p.n){planet.AvgLinkLength = p.n};
+			if(p.v){planet.avgActiveCycles = p.v};
+			if(p.f){planet.isFactoryPlanet = p.f};
+			if(p.x){planet.text = p.x};
+			planet.planetId = planets.length;
+			planets.push(planet);
+			console.log(planet);
+		});
+		console.log("should be pushing this now");
+		$scope.planets = planets;
+		angular.forEach($scope.planets, function(p){
+			p.updateCPU();
+			p.updateGrid();
+			p.updateCost();
+			p.updateStorage();
+			p.updateImportExports();
+			p.updateAllowedPlanets();
+		})
+		$scope.changeActivePlanet(0);
 	}
 	
 });
