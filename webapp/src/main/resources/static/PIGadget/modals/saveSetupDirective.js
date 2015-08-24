@@ -104,8 +104,8 @@ app.controller('SaveSetupJsonController', function($scope, $modalInstance, displ
 
 app.controller('SaveSetupUrlController', function($scope, $modalInstance, planetApi, display){
 	$scope.display = '';
-//	$scope.url = "http://EveGadgets.com/#/pi";
-	$scope.url = "http://localhost:8081/#/pi";
+	$scope.url = "http://EveGadgets.com/#/pi";
+//	$scope.url = "http://localhost:8081/#/pi";
 	
 	planetApi.saveSetup(display)
 	.then(function(response){
