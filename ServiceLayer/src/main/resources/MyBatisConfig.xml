@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+ 
+<configuration>
+
+	<properties resource="database.properties"/>
+ 
+    <typeAliases>
+        <typeAlias alias="Type" 
+        	type="org.servicelayer.models.Type"/>
+        <typeAlias alias="Materials" 
+        	type="org.servicelayer.models.Materials"/>
+        <typeAlias alias="Planet" 
+        	type="org.servicelayer.models.PlanetDomain"/>
+        <typeAlias alias="Resource" 
+        	type="org.servicelayer.models.ResourceDomain"/>
+        <typeAlias alias="TypeNamePredomain" 
+        	type="org.servicelayer.models.TypeNamePredomain"/>
+        <typeAlias alias="Schematic" 
+        	type="org.servicelayer.models.SchematicDomain"/>
+        <typeAlias alias="Component" 
+        	type="org.servicelayer.models.ComponentDomain"/>
+        <typeAlias alias="NameMapDomain" 
+        	type="org.servicelayer.models.NameMapDomain"/>
+        <typeAlias alias="ItemDetailsDomain" 
+        	type="org.servicelayer.models.ItemDetailsDomain"/>
+        <typeAlias alias="PersistPlanetDomain"
+        	type="org.servicelayer.models.PersistPlanetDomain"/>
+        <typeAlias alias="ReprocessRecipe"
+        	type="org.servicelayer.models.ReprocessRecipeDomain"/>
+        <typeAlias alias="TypeAndQuantity"
+        	type="org.servicelayer.models.IdAndQuantityDomain"/>
+        <typeAlias alias="ImportantItemDetails"
+        	type="org.servicelayer.models.ImportantItemDetailsDomain"/>
+    </typeAliases>
+    
+	<environments default="development">
+        <environment id="development">
+          <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${database.driver}"/>
+                <property name="url" value="${database.url}"/>
+                <property name="username" value="${database.user}"/>
+                <property name="password" value="${database.password}"/>
+            </dataSource>
+       </environment>
+    </environments>
+ 
+    <mappers>
+       <!-- <mapper resource="main/resources/Type.xml"/> -->
+       <mapper resource="mappers/Type.xml"/>
+       <mapper resource="mappers/Planets.xml"/>
+       <mapper resource="mappers/TypeName.xml"/>
+       <mapper resource="mappers/Schematics.xml"/>
+       <mapper resource="mappers/NameMap.xml"/>
+       <mapper resource="mappers/ItemDetails.xml"/>
+       <mapper resource="mappers/PlanetPersistence.xml"/>
+       <mapper resource="mappers/Reprocessor.xml"/>
+    </mappers> 
+
+</configuration>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="NameMap">
+ 
+   <resultMap id="NameMapDomain" type="NameMapDomain" autoMapping="true">
+		<id property="id" column="typeID"/>
+		<id property="name" column="typeName"/>
+    </resultMap>
+    
+    <select id="getPlanetResourceNameMap" resultMap="NameMapDomain">
+        SELECT
+			typeID,
+			typeName			
+		FROM invTypes
+		WHERE marketGroupID IN (1333,1334,1335,1336,1337);
+    </select>
+</mapper>

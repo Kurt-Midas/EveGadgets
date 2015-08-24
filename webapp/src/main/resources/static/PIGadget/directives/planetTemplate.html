@@ -11,21 +11,18 @@
 			<tr>
 				<th>Item</th>
 				<th>Hourly</th>
-				<th>Max Run</th>
-				<th>P.IDs</th>
+				<th class="hidden-sm hidden-xs">Resupply</th>
 			</tr>
 			<tr ng-repeat="item in totalImportExport" ng-if="item.quantity < 0" class="importColors">
 				<td>{{data.itemDetails[item.typeID].name}}</td>
 				<td>{{item.quantity * -1  | number}} </td>
-				<td>{{item.quantity * minRuntime * -1 | number}}</td>
-				<td>{{item.planets}}</td>
+				<td class="hidden-sm hidden-xs">{{item.quantity * minRuntime * -1 | number}}</td>
 			</tr>
 			<tr></tr>
 			<tr ng-repeat="item in totalImportExport" ng-if="item.quantity > 0" class="exportColors">
 				<td>{{data.itemDetails[item.typeID].name}}</td>
 				<td>{{item.quantity | number}}</td>
-				<td>{{item.quantity * minRuntime | number}}</td>
-				<td>{{item.planets}}</td>
+				<td class="hidden-sm hidden-xs">{{item.quantity * minRuntime | number}}</td>
 			</tr>
 		</table>
     </nav>
@@ -64,7 +61,7 @@
 		</div>
 		
 		<!-- Info Panel -->
-		<div class="col-xs-6" style="padding-left:4px">
+		<div class="col-sm-12 col-md-6" style="padding-left:4px">
 		
 			<div class="row">
 				<div class="col-xs-12">Possible Planet Types</div>
@@ -77,8 +74,10 @@
 			<div class="col-xs-6">
 				<div class="barContainer">
 					<div class="row">
-						Resupply Interval: {{p.runtime}}
-						<span style="float:right">{{p.runtime/24 | number:1}} days</span>
+						Supply Hrs: <small>{{p.runtime}}</small>
+						<span style="float:right">
+							<small>{{p.runtime/24 | number:1}} days</small>
+						</span>
 						</div>
 						<div class="progress row">
 						  <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="24" 
@@ -93,10 +92,10 @@
 			<div class="col-xs-6" style="padding-right:4px">
 				<div class="barContainer">
 					<div class="row">
-						CPU: {{p.CPU/cclevel[p.level].CPU * 100 | number:1}}%
+						CPU: <small>{{p.CPU/cclevel[p.level].CPU * 100 | number:1}}%</small>
 						
 						<span class="pull-right">
-							{{p.CPU|number:1}}/{{cclevel[p.level].CPU|number:0}}tf
+							<small>{{p.CPU|number:1}}/{{cclevel[p.level].CPU|number:0}}tf</small>
 						</span>
 					</div>
 					<div class="progress row">
@@ -107,9 +106,9 @@
 					  </div>
 					</div>
 					<div class="row">
-						Power: {{p.Powergrid/cclevel[p.level].Power * 100 | number:1}}%
+						Power: <small>{{p.Powergrid/cclevel[p.level].Power * 100 | number:1}}%</small>
 						<span class="pull-right">
-							{{p.Powergrid|number:1}}/{{cclevel[p.level].Power|number:0}}gw
+							<small>{{p.Powergrid|number:1}}/{{cclevel[p.level].Power|number:0}}gw</small>
 						</span>
 					</div>
 					<div class="progress row">
@@ -170,7 +169,7 @@
 		</div>
 		
 		<!-- Interaction Panel -->
-		<div class="col-xs-6">
+		<div class="col-sm-12 col-md-6">
 		
 			<div class="row">
 				<h4 >Add Basic Factory

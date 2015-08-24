@@ -1,36 +1,25 @@
 var app = angular.module('planetApp', ['ui.bootstrap', 
                                        'ngRoute', 
-                                       'util']);
+                                       'util',
+                                       'scrapGadget']);
 
 app.config(function($routeProvider, $httpProvider) {
 	$routeProvider.
-		when('/', {
+		when('/pi', {
 			templateUrl: 'PIGadget/PIApp.html',
 			controller: 'planetAppController',
 		}).
-		when('/:planetKey', {
+		when('/pi/:planetKey', {
 			templateUrl: 'PIGadget/PIApp.html',
 			controller: 'planetAppController',
-			/*
-			working with resolve and $q is a good idea eventually
-			but not before I get a setup method
-			with a defined resolution order 
-			*/
 		}).
-//		when('/FAQ', {
-//			templateUrl: 'PIFaq.html',
-//			controller: 'FAQController'
-//		}).
-//		when('/contact', {
-//			templateUrl: 'Contact.html',
-//			controller: 'ContractCtrl'
-//		}).
+		when('/scrap',{
+			templateUrl: 'ScrapGadget/Scrap.html',
+			controller: 'scrapGadgetController',
+		}).
 		otherwise({
-			redirectTo: '/'
+			redirectTo: '/pi'
 		});
-	
-//	$httpProvider.defaults.headers.common['Access-Control-Allow-Headers']
-//		= '*';
 });
 
 //directives
@@ -45,7 +34,8 @@ app.directive('variableHeight', function(){
 app.controller('ContactCtrl', function(){
 });
 
-app.controller('planetAppController', function($scope, $http, $rootScope, $routeParams){
+app.controller('planetAppController', ['$scope', '$http', '$rootScope', '$routeParams', 'planetApi','regionListUtil',
+                                       function($scope, $http, $rootScope, $routeParams, planetApi, regionListUtil){
 
 	$scope.planets = [];
 
@@ -108,9 +98,40 @@ app.controller('planetAppController', function($scope, $http, $rootScope, $route
 		populateDatalists();
 		if($routeParams.planetKey){
 			console.log("params.planetKey identified: " + $routeParams.planetKey);
-			var setup = planetApi.getPlanet($routeParams.planetKey);
-			console.log("got setup string: " + setup);
-			$scope.populateSetupFromJson(setup);
+			planetApi.getSetup($routeParams.planetKey)
+			.success(function(data){
+				if(data['setup']) {
+					$scope.populateSetupFromJson(data['setup']);
+				}else{
+					console.error("Failed to retrieve setup: " + angular.toJson(data));
+				}
+			});
+			/*var setup = planetApi.getSetup($routeParams.planetKey);
+			if(setup){
+				console.log("got setup string: " + setup);
+				$scope.populateSetupFromJson(setup);
+			}else{
+				console.log("did not get setup");
+			}*/
+			
+			/*
+			 * 
+			 * $http(getData)
+			.success(function(data){
+				if(data['setup']) {
+					return data['setup'];
+				}
+				else(data['ERROR']) 
+				{
+					console.error("Error thrown: " + data['ERROR']);
+				}
+			})
+			.error(function(data,status,headers,config){
+				console.error("getSetup failed with info: " + data + " " + status + " " 
+					+ headers + " " + config);
+				return null;
+			})
+			 */
 		}
 	});
 	
@@ -763,7 +784,8 @@ app.controller('planetAppController', function($scope, $http, $rootScope, $route
 	
 	
 	
-	$scope.$watch('planets.length', function(){
+//	$scope.$watch('planets.length', function(){
+	$scope.$watch(document.getElementById('planetNavTabs').offsetHeight, function(){
 		var height = document.getElementById("planetNavTabs").offsetHeight;
 		document.getElementById("planetContent").style.marginTop = height + "px";
 		document.getElementById("infoContent").style.marginTop = height + "px";
@@ -805,11 +827,11 @@ app.controller('planetAppController', function($scope, $http, $rootScope, $route
 		}
 	}
 	
-	$scope.marketHubList = ({30000142:"Jita", 10000002:"The Forge"});
+	$scope.marketHubList = regionListUtil.getRegionList();
 	
 	$scope.calledRemoteSuccessfully = false;
-	$scope.importMarketSystem = 30000142;
-	$scope.exportMarketSystem = 30000142;
+	$scope.importMarketSystem = 10000002;
+	$scope.exportMarketSystem = 10000002;
 	$scope.orderTypeList = ["buy", "sell"]; //ignoring all
 	$scope.marketStatTypeList = ["wavg", "avg", "median", "fivePercent", "max", "min"];
 
@@ -1020,8 +1042,8 @@ app.controller('planetAppController', function($scope, $http, $rootScope, $route
 		console.log("Inside generateSavePlanetJson");
 		var json = {};
 		//i, e + s, o, m, b, t
-		if($scope.importMarketSystem != 30000142){json.is = $scope.importMarketSystem;}
-		if($scope.exportMarketSystem != 30000142){json.es = $scope.exportMarketSystem;}
+		if($scope.importMarketSystem != 10000002){json.is = $scope.importMarketSystem;}
+		if($scope.exportMarketSystem != 10000002){json.es = $scope.exportMarketSystem;}
 		if($scope.im_orderType != "buy"){json.io = $scope.im_orderType;}
 		if($scope.ex_orderType != "buy"){json.eo = $scope.ex_orderType;}
 		if($scope.im_marketStatType != "fivePercent"){json.im = $scope.im_marketStatType;}
@@ -1108,8 +1130,8 @@ app.controller('planetAppController', function($scope, $http, $rootScope, $route
 		console.log("trying to populate setup");
 		console.log("string version: " + stringVersion);
 		console.log("json version: " + json);
-		if(json.is){$scope.importMarketSystem = json.is;} else {$scope.importMarketSystem = 30000142;}
-		if(json.es){$scope.exportMarketSystem = json.es;} else {$scope.exportMarketSystem = 30000142;}
+		if(json.is){$scope.importMarketSystem = json.is;} else {$scope.importMarketSystem = 10000002;}
+		if(json.es){$scope.exportMarketSystem = json.es;} else {$scope.exportMarketSystem = 10000002;}
 		if(json.io){$scope.im_orderType = json.io;} else {$scope.im_orderType = "buy";}
 		if(json.eo){$scope.ex_orderType = json.eo;} else {$scope.ex_orderType = "buy";}
 		if(json.im){$scope.im_marketStatType = json.im;} else {$scope.im_marketStatType = "fivePercent";}
@@ -1198,4 +1220,4 @@ app.controller('planetAppController', function($scope, $http, $rootScope, $route
 		$scope.changeActivePlanet(0);
 	}
 	
-});
+}]);

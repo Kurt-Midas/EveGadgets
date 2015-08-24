@@ -21,6 +21,8 @@
 		<module>planetary</module>
 		<module>webapp</module>
     	<module>priceutils</module>
+    	<module>Scrap</module>
+    <module>ServiceLayer</module>
   </modules>
 
 	<dependencies>
@@ -28,15 +30,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.mybatis</groupId>
-			<artifactId>mybatis-spring</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-		<dependency>
-    		<groupId>mysql</groupId>
-    		<artifactId>mysql-connector-java</artifactId>
-    	</dependency>
+		
     	<dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

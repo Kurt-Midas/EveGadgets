@@ -1,0 +1,88 @@
+<!-- Scrap-specific Scripts -->
+
+
+<!-- Container -->
+<div class="container container-fluid">
+	<!-- Input and everything -->
+	<div class="col-xs-12 col-sm-5">
+		<div class="form-group">
+			<label for="itemInput">Paste Crap Here:</label>
+			<textarea class="form-control" rows="10" id="itemInput" ng-model="textScrape"></textarea>
+			<button class="btn btn-default" ng-click="execute()" ng-hide="executeInProgress">Calculate</button>
+			<button class="btn btn-default disabled" ng-show="executeInProgress">In Progress...</button>
+		</div>
+		
+		<div>{{recipeList}}</div>
+		<!-- <div>{{recipeList}}</div>
+		<div>{{details}}</div>
+		<div>{{prices}}</div> -->
+	</div>
+		
+	<!-- Output -->
+	<div class="col-xs-12 col-sm-7">
+		<div>Multiple ng-repeats and jazz go here, it's gonna be fun. Accordions and shit.</div> 
+		<div>Base it around a %, IE reprocessedValue / Jita Value</div>
+		<div>Might be more complex than worth to put this in a directive</div>
+		
+		<!-- <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+			<div class="panel panel-default" ng-repeat="r in recipeList">
+				<div class="panel-heading" role="tab" id="heading{{r.id}}">
+					<h4 class="panel-title">
+						<a role="button" data-toggle="collapse" data-parent="#accordion" 
+						ng-click="#collapse{{r.id}}" aria-expanded="true" aria-controls="collapse{{r.id}}">
+							{{details[r.id].name}}
+						</a>
+					</h4>
+				</div>
+				<div id="collapse{{r.id}}" class="panel-collapse collapse in" role="tabpanel" aria-labeledby="heading{{r.id}}">
+					<div class="panel-body">
+						<table class="table table-condensed" >
+							<tr>
+								<th>Component</th>
+								<th>Quantity</th>
+							</tr>
+							<tr ng-repeat="item in r.recipe">
+								<td>{{details[item.id].name}}</td>
+								<td>{{item.quantity | number}} </td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		 -->
+		
+		
+		
+		<div>
+			<h3>Total Profit: {{totalReprocessedProfit}}isk</h3>
+		
+			<div ng-repeat="r in recipeList">
+				<h4>
+					<a ng-click="r.viewDetails=!r.viewDetails">
+						{{details[r.id].name}}
+					</a>
+					<span class="pull-right">{{r.price}}isk, {{r.jitaPercent}}%</span>
+				</h4>
+				<table class="table table-condensed" ng-if="r.viewDetails">
+					<tr>
+						<th>Component</th>
+						<th>Quantity</th>
+						<th>{{reprocessPercentage}}% Efficiency</th>
+						<th>Recovered Price</th>
+					</tr>
+					<tr ng-repeat="item in r.recipe">
+						<td>{{details[item.id].name}}</td>
+						<td>{{item.quantity | number}} </td>
+						<td>{{item.recovered | number}}</td>
+						<td>{{item.price | number}}isk
+					</tr>
+				</table>
+		
+		
+		
+			</div>
+		
+		</div>
+	</div>
+</div>

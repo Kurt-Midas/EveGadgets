@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="Reprocessor">
+
+	<resultMap id="recipeResult" type="ReprocessRecipe" autoMapping="true">
+        <id property="id" column="typeID" javaType="integer"/>
+        <collection property="materials" ofType="TypeAndQuantity">
+			<id property="id" column="materialTypeID" javaType="integer"/>
+			<id property="quantity" column="quantity" javaType="integer"/>
+		</collection>
+    </resultMap>
+
+ 	<select id="getByTypeIdList" resultMap="recipeResult">
+   		SELECT
+			T.typeID,
+			M.materialTypeID,
+			M.quantity,
+		FROM invtypes T
+			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
+		WHERE T.typeID IN 
+		<foreach item="item" index="idList" collection="list"
+			open="(" separator="," close=")">#{item}
+		</foreach>
+    </select>
+    
+     <select id="getByNameList" resultMap="recipeResult">
+   		SELECT
+			T.typeID,
+			M.materialTypeID,
+			M.quantity
+		FROM invtypes T
+			INNER JOIN invTypeMaterials M on M.typeID=T.typeID
+		WHERE T.typeName IN 
+		<foreach item="item" index="nameList" collection="list"
+			open="(" separator="," close=")">#{item}
+		</foreach>
+    </select>
+    
+</mapper>

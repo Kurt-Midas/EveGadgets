@@ -239,7 +239,9 @@
 		<tr>
 			<td>Profit Per Hour</td>
 			<td></td>
-			<td class="pull-right" ng-class="totalProfitPerHour > 0 ? 'exportColors' : 'importColors'">{{totalProfitPerHour | number:2}} isk</td>
+			<td class="pull-right" ng-class="totalProfitPerHour > 0 ? 'exportColors' : 'importColors'">
+				{{totalProfitPerHour | number:2}} isk
+			</td>
 		</tr>
 		<tr>
 		</tr>
@@ -265,7 +267,7 @@
 				<tr>
 					<th>Item</th>
 					<th>Hourly</th>
-					<th>System Run</th>
+					<th class="hidden-sm">System Run</th>
 					<th>Maximum</th>
 				<tr ng-repeat-start="p in planets">
 					<td><h4>{{p.text}}</h4></td>
@@ -274,7 +276,7 @@
 				<tr ng-repeat="item in p.importExport" ng-if="item.quantity < 0" class="importColors">
 						<td>{{data.itemDetails[item.typeID].name}}</td>
 					<td>{{item.quantity * -1 | number:2 | number}}</td>
-					<td>{{item.quantity * minRuntime * -1 | number}}</td>
+					<td class="hidden-sm">{{item.quantity * minRuntime * -1 | number}}</td>
 					<td>{{item.quantity * p.runtime * -1 | number}}</td>
 				</tr>
 				<tr></tr>
@@ -282,7 +284,7 @@
 					ng-repeat-end>
 					<td>{{data.itemDetails[item.typeID].name}}</td>
 					<td>{{item.quantity | number:2 | number}}</td>
-					<td>{{item.quantity * minRuntime | number}}</td>
+					<td class="hidden-sm">{{item.quantity * minRuntime | number}}</td>
 					<td>{{item.quantity * p.runtime | number}}</td>
 				</tr>
 			</table>
@@ -422,7 +424,5 @@
 		<button class="btn btn-danger" ng-click="populateSetupFromJson(savePlanetJson)">Repopulate</button>
 	</div> -->
 	
-	<eg-save-setup-modal generate-save-setup-json="generateSavePlanetJson()"></eg-save-setup-modal>
-	<eg-load-setup-modal populate-setup-from-json="populateSetupFromJson(recoveryString)"></eg-load-setup-modal>
 	
 </div>

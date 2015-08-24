@@ -12,9 +12,10 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 @RestController
 @SpringBootApplication
 @ComponentScan({
-	"com.evegadgets.gadgets.planetary.controllers", 
+	"org.planetary.controllers", 
 	"org.priceutils.controllers",
-	"com.evegadgets.gadgets.webapp.controllers"})
+	"com.evegadgets.gadgets.webapp.controllers",
+	"org.scrap.controllers"})
 public class Application { 
 	 
 	public static void main(String[] args) throws IOException{

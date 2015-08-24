@@ -16,6 +16,12 @@
 	<name>Planet module child of gadget-parent</name>
 
 	
-	
+	<dependencies>
+		<dependency>
+			<groupId>org.evegadgets.gadgets</groupId>
+			<artifactId>ServiceLayer</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
 
 </project>

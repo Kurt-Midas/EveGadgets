@@ -2,7 +2,7 @@ app.directive('egLoadSetupModal', ['$modal', 'planetApi', function ($modal, plan
     return {
         restrict: 'E',
 
-        templateUrl: '/PIGadget/modals/loadSetupModal.html',
+        template: '<a ng-click="open()">Recover Setup</a>',
 
         replace: true,
         

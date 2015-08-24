@@ -224,6 +224,10 @@ input[type=number]::-webkit-outer-spin-button {
 .btn-duplicate{
 	margin-left: 31px !important;
 }
+.nav-tabs-minimal{
+	padding-top: 4px !important;
+	padding-bottom: 2px !important;
+}
 input[type=number]::-webkit-inner-spin-button, 
 input[type=number]::-webkit-outer-spin-button { 
   -webkit-appearance: none; 

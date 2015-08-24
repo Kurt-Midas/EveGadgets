@@ -1,7 +1,52 @@
 
 <div class="navbar planetTabs barColors borderColors" id="planetNavTabs">
+
+	<ul class="nav nav-tabs">
+		<li role="presentation">
+			<a class="nav-tabs-minimal" ng-click="addPlanet()" style="border-color: darkred; color: black">Add Planet</a>
+		</li>
+		<!-- ng-class="totalProfitPerHour > 0 ? 'exportColors' : 'importColors'" -->
+		<li role="presentation" ng-class="{'active' : activePlanet == -1}">
+			<a class="nav-tabs-minimal" ng-click="changeActivePlanet(-1); populatePriceMap()">Information Panel</a>
+		</li>
+		<li role="presentation" ng-class="{'active' : activePlanet == p.planetID}" 
+			ng-repeat="p in planets">
+			<a class="nav-tabs-minimal" ng-click="changeActivePlanet(p.planetID)">{{p.text}}</a>
+		</li>
+		
+		<li role="presentation" class="dropdown pull-right">
+			<a class="dropdown-toggle nav-tabs-minimal" data-toggle="dropdown" role="button" 
+			aria-haspopup="true" aria-expanded="false" style="border-color: darkred; color: black">
+				Menu <span class="caret"></span>
+    		</a>
+    		<ul class="dropdown-menu">
+			  	<li><eg-save-setup-modal generate-save-setup-json="generateSavePlanetJson()"></eg-save-setup-modal></li>
+				<li><eg-load-setup-modal populate-setup-from-json="populateSetupFromJson(recoveryString)"></eg-load-setup-modal></li>
+				<li><eg-about-modal></eg-about-modal></li>
+				<li><eg-planet-help-modal></eg-planet-help-modal></li>
+				<li role="separator" class="divider"></li>
+				<li><eg-confirm-reset reset="ResetPlanets()"></eg-confirm-reset></li>
+			</ul>
+		</li>
+		
+	</ul>
 	
-	<button ng-click="addPlanet()" class="btn btn-primary addPlanetButton planetTabButtonPadding borderColors">
+	<!-- <div class="btn-group pull-right">
+	  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" 
+	  	aria-haspopup="true" aria-expanded="false">
+	    	Menu <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu">
+	  	<li><eg-save-setup-modal generate-save-setup-json="generateSavePlanetJson()"></eg-save-setup-modal></li>
+		<li><eg-load-setup-modal populate-setup-from-json="populateSetupFromJson(recoveryString)"></eg-load-setup-modal></li>
+		<li><eg-about-modal></eg-about-modal></li>
+		<li><eg-planet-help-modal></eg-planet-help-modal></li>
+		<li role="separator" class="divider"></li>
+		<li><eg-confirm-reset reset="ResetPlanets()"></eg-confirm-reset></li>
+	  </ul>
+	</div> -->
+	
+	<!-- <button ng-click="addPlanet()" class="btn btn-primary addPlanetButton planetTabButtonPadding borderColors">
 		Add Planet
 	</button>
 	
@@ -13,12 +58,27 @@
     <button class="btn planetButton planetTabButton planetTabButtonPadding" 
     	ng-repeat="p in planets" ng-click="changeActivePlanet(p.planetID)">
     	{{p.text}}
-    </button>
+    </button> -->
 	
-	<button ng-click="ResetPlanets()" class="btn btn-danger addPlanetButton planetTabButtonPadding borderColors"
+	<!-- <button ng-click="ResetPlanets()" class="btn btn-danger addPlanetButton planetTabButtonPadding borderColors"
 		style="float:right">
 		Reset Everything
-	</button>
+	</button> -->
+	
+	<!-- <div class="btn-group pull-right">
+	  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" 
+	  	aria-haspopup="true" aria-expanded="false">
+	    	Menu <span class="caret"></span>
+	  </button>
+	  <ul class="dropdown-menu">
+	  	<li><eg-save-setup-modal generate-save-setup-json="generateSavePlanetJson()"></eg-save-setup-modal></li>
+		<li><eg-load-setup-modal populate-setup-from-json="populateSetupFromJson(recoveryString)"></eg-load-setup-modal></li>
+		<li><eg-about-modal></eg-about-modal></li>
+		<li><eg-planet-help-modal></eg-planet-help-modal></li>
+		<li role="separator" class="divider"></li>
+		<li><eg-confirm-reset reset="ResetPlanets()"></eg-confirm-reset></li>
+	  </ul>
+	</div> -->
 </div>
 
 <!-- Infopanel. Turn into switch? Also probably directive -->

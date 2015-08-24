@@ -7,6 +7,8 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.planetary.pricing.MockPriceUtil;
+import org.planetary.pricing.PriceMap;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MockPriceUtilTest {

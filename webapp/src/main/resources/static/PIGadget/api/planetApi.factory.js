@@ -3,7 +3,7 @@
 app.directive('myAccordion', function(){
 */
 
-app.factory('planetApi', ['$http', function($http){
+app.factory('planetApi', ['$http', '$q', function($http, $q){
 	
 	return{
 		saveSetup: function(setup){
@@ -15,25 +15,10 @@ app.factory('planetApi', ['$http', function($http){
 				data: setup
 			};
 			console.log("Making call with : " + angular.toJson(setup) + ", " + setup);
-			$http(getData)
-			.success(function(data){
-				console.log("Success: " + angular.toJson(data));
-				if(data['KEY']){
-					console.log("Returning key: " + data['KEY']);
-					return data['KEY'];
-				}
-				else if(data['ERROR']){
-					console.error("Error thrown: " + data['ERROR']);
-					return null;
-				}
-			})
-			.error(function(data,status,headers,config){
-				console.error("saveSetup failed with info: " + angular.toJson(data) + "\n" + status + "\n" 
-					+ headers + "\n" + angular.toJson(config));
-				return null;
-			})
+			return $http(getData);
 		},
 		getSetup: function(key){
+			console.log("inside getSetup");
 			var getData = {
 				method: 'POST',
 				url: '/persist/getSetup',
@@ -42,39 +27,8 @@ app.factory('planetApi', ['$http', function($http){
 					id: key
 				}*/
 			};
-			$http(getData)
-			.success(function(data){
-				if(data['setup']) {
-					return data['setup'];
-				}
-				else(data['ERROR']) 
-				{
-					console.error("Error thrown: " + data['ERROR']);
-				}
-			})
-			.error(function(data,status,headers,config){
-				console.error("getSetup failed with info: " + data + " " + status + " " 
-					+ headers + " " + config);
-				return null;
-			})
+			console.log("make call with: " + angular.toJson(getData));
+			return $http(getData);
 		}
 	};
 }]);
-
-/*var getData = {method: 'GET',
-url: '/priceAPI/mock',
-params: {
-	typeList: types
-}};
-console.log("Making call: " + getData);
-$http(getData)
-.success(function(data){
-	$scope.marketPrices = data;
-	console.log("Call successful with response: " + $scope.marketPrices);
-	$scope.updateTotalImportExportCost();
-})
-.error(function(data, status, headers, config){
-	console.error("populatePriceMapFromStatic failed with info: " + data + " " + status + " " 
-			+ headers + " " + config); 
-});
-*/

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="ItemDetails">
+ 
+   <resultMap id="TypeNameTier" type="ItemDetailsDomain" autoMapping="true">
+		<id property="typeID" column="typeID"/>
+		<id property="name" column="typeName"/>
+		<id property="tier" column="marketGroupID"/>
+    </resultMap>
+   
+   <resultMap id="ImportantDetails" type="ImportantItemDetails" autoMapping="true">
+		<id property="typeId" column="typeID"/>
+		<id property="name" column="typeName"/>
+		<id property="volume" column="volume"/>
+		<id property="groupId" column="groupID"/>
+		<id property="categoryId" column="categoryID"/>
+		<id property="marketGroupID" column="marketGroupID"/>
+    </resultMap> 
+    
+    <select id="getPlanetResourceTypeNameTier" resultMap="TypeNameTier">
+        SELECT
+			typeID,
+			typeName,
+			marketGroupID			
+		FROM invTypes
+		WHERE marketGroupID IN (1333,1334,1335,1336,1337);
+    </select>
+    
+    <select id="getImportantItemDetails" resultMap="ImportantDetails">
+        SELECT
+			T.typeID,
+			T.typeName,
+			T.volume,
+			G.groupId,
+			G.categoryId,
+			T.marketGroupID
+		FROM invTypes T
+			INNER JOIN invGroups G ON G.groupID = T.groupID
+		WHERE typeID IN 
+		<foreach item="item" index="idList" collection="list"
+			open="(" separator="," close=")">#{item}
+		</foreach>
+    </select> <!-- Eventually join this with invMarketGroups and invCategories -->
+    
+</mapper>

@@ -2,7 +2,7 @@ app.directive('egSaveSetupModal', ['$modal', 'planetApi', function ($modal, plan
     return {
         restrict: 'E',
 
-        templateUrl: '/PIGadget/modals/saveSetupModalTemplate.html',
+        template: '<a ng-click="open()">Save Setup</a>',
 
         replace: true,
         
@@ -35,7 +35,7 @@ app.directive('egSaveSetupModal', ['$modal', 'planetApi', function ($modal, plan
         		$scope.saveSetupJson = '';
         		var modalInstance = $modal.open({
         			animation: true,
-        			templateUrl: 'saveSetupModal.html',
+        			templateUrl: "/PIGadget/modals/saveSetupModalTemplate.html",
         			size: 'lg',
         			controller: 'SaveSetupModalInstanceController'
         		});
@@ -45,9 +45,9 @@ app.directive('egSaveSetupModal', ['$modal', 'planetApi', function ($modal, plan
         				console.log("caught request for text block");
         				$modal.open({
         					animation: true,
-        					template: "<div class='modal-body'>{{display}}: getText stuff here'</div>",
+        					templateUrl: "/PIGadget/modals/saveSetupAsJsonResultModal.html",
         					size: 'lg',
-        					controller: 'SaveSetupResultController',
+        					controller: 'SaveSetupJsonController',
         					resolve: {
         						display: function(){
         							return $scope.getTextBlock();
@@ -59,15 +59,22 @@ app.directive('egSaveSetupModal', ['$modal', 'planetApi', function ($modal, plan
         				console.log("caught request for url");
         				$modal.open({
         					animation: true,
-        					template: "<div class='modal-body'>{{display}}: getUrl stuff here'</div>",
+        					templateUrl: "/PIGadget/modals/saveSetupAsUrlResultModal.html",
         					size: 'lg',
-        					controller: 'SaveSetupResultController',
+        					controller: 'SaveSetupUrlController',
         					resolve: {
         						display: function(){
-//        							return "INCOMPLETE IMPLEMENTATION AT SAVE_SETUP_MODAL_DIRECTIVE.JS";
-        							return planetApi.saveSetup($scope.getTextBlock());
+        							return $scope.getTextBlock();
         						}
-        					}
+        					}        					
+//        						display: function(){
+//        							return "INCOMPLETE IMPLEMENTATION AT SAVE_SETUP_MODAL_DIRECTIVE.JS";
+//        							var urlDisplay = planetApi.saveSetup($scope.getTextBlock());
+//        							console.log("urlDisplay is : " + urlDisplay);
+//        							return urlDisplay;
+        							
+        							
+//        						}
         				});
         			}
         		});
@@ -91,6 +98,22 @@ app.controller('SaveSetupModalInstanceController', function($scope, $modalInstan
 	}
 });
 
-app.controller('SaveSetupResultController', function($scope, $modalInstance, display){
+app.controller('SaveSetupJsonController', function($scope, $modalInstance, display){
 	$scope.display = display;
+});
+
+app.controller('SaveSetupUrlController', function($scope, $modalInstance, planetApi, display){
+	$scope.display = '';
+//	$scope.url = "http://EveGadgets.com/#/pi";
+	$scope.url = "http://localhost:8081/#/pi";
+	
+	planetApi.saveSetup(display)
+	.then(function(response){
+		var data = response.data;
+		console.log("call succeeded? " + data + ": " + angular.toJson(data) + ", Key: " + data['KEY']);
+		$scope.display = data['KEY'];
+	}, function(reason){
+		console.error("call failed? " + reason);
+	});
+
 });
